@@ -279,7 +279,6 @@
     linear-gradient(180deg, rgba(255, 253, 244, 0.84), rgba(214, 221, 213, 0.9));
 }
 
-.operatorPortrait,
 .pickerCard img {
   position: absolute;
   inset: 0;
@@ -287,40 +286,6 @@
   height: 100%;
   object-fit: contain;
   object-position: center;
-}
-
-.operatorMiniProfession {
-  position: absolute;
-  z-index: 2;
-  top: 4px;
-  left: 4px;
-  width: 17px;
-  height: 17px;
-  object-fit: contain;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45));
-}
-
-.operatorMiniRarity {
-  position: absolute;
-  z-index: 2;
-  right: 4px;
-  bottom: 4px;
-  width: auto;
-  max-width: calc(100% - 8px);
-  height: 16px;
-  object-fit: contain;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45));
-}
-
-.operatorPortraitFallback {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  place-items: center;
-  color: #f8f7f0;
-  background: #526158;
-  font-size: 20px;
-  font-weight: 900;
 }
 
 .operatorCardName {

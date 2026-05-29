@@ -8,6 +8,7 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { useState, type ReactNode } from "react";
+import { OperatorPortrait } from "../shared/OperatorPortrait";
 import type { Operator, SlotAddress } from "../../domain/types";
 import styles from "../../styles/drag.module.css";
 
@@ -46,17 +47,12 @@ function initials(name: string): string {
 function SquareDragPreview({ operator }: { operator: Operator }) {
   return (
     <div className={styles.dragPreview} data-drag-preview="operator">
-      {operator.portraitPath ? (
-        <img alt="" className={styles.portrait} src={operator.portraitPath} />
-      ) : (
-        <span className={styles.fallback}>{initials(operator.name)}</span>
-      )}
-      {operator.professionIconPath ? (
-        <img alt="" className={styles.professionIcon} data-profession-icon src={operator.professionIconPath} />
-      ) : null}
-      {operator.rarityIconPath ? (
-        <img alt="" className={styles.rarityIcon} data-rarity-icon src={operator.rarityIconPath} />
-      ) : null}
+      <OperatorPortrait
+        fallbackText={initials(operator.name)}
+        portraitPath={operator.portraitPath}
+        professionIconPath={operator.professionIconPath}
+        rarityIconPath={operator.rarityIconPath}
+      />
       <span className={styles.name}>{operator.name}</span>
     </div>
   );

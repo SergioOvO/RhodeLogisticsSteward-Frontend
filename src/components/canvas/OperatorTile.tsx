@@ -7,6 +7,7 @@ import type {
   SlotAddress,
   SlotAssignment,
 } from "../../domain/types";
+import { OperatorPortrait } from "../shared/OperatorPortrait";
 import styles from "../../styles/canvas.module.css";
 
 const eliteIconPaths: Record<ElitePhase, string> = {
@@ -72,30 +73,13 @@ export function OperatorTile({
       type="button"
     >
       <span className={styles.portraitFrame} data-portrait-frame>
-        {operator?.portraitPath ? (
-          <img alt="" className={styles.portrait} src={operator.portraitPath} />
-        ) : (
-          <span className={styles.fallbackPortrait}>{operator ? initials(operator.name) : slot.slotIndex + 1}</span>
-        )}
-        {operator?.professionIconPath ? (
-          <img
-            alt={operator.profession ?? ""}
-            className={styles.professionIcon}
-            data-profession-icon
-            src={operator.professionIconPath}
-          />
-        ) : null}
-        {displayElitePhase ? (
-          <img
-            alt={`精英化${displayElitePhase}`}
-            className={styles.eliteIcon}
-            data-elite-icon
-            src={eliteIconPaths[displayElitePhase]}
-          />
-        ) : null}
-        {operator?.rarityIconPath ? (
-          <img alt="" className={styles.rarityIcon} data-rarity-icon src={operator.rarityIconPath} />
-        ) : null}
+        <OperatorPortrait
+          eliteIconPath={displayElitePhase ? eliteIconPaths[displayElitePhase] : undefined}
+          fallbackText={operator ? initials(operator.name) : String(slot.slotIndex + 1)}
+          portraitPath={operator?.portraitPath}
+          professionIconPath={operator?.professionIconPath}
+          rarityIconPath={operator?.rarityIconPath}
+        />
       </span>
       <span className={styles.slotText}>
         <span className={styles.operatorName} data-slot-name>

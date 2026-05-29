@@ -475,65 +475,6 @@
     linear-gradient(180deg, rgba(255, 253, 244, 0.82), rgba(214, 221, 213, 0.88));
 }
 
-.portrait {
-  position: absolute;
-  inset: 0;
-  width: 112%;
-  height: 112%;
-  object-fit: cover;
-  object-position: center 18%;
-}
-
-.professionIcon {
-  position: absolute;
-  z-index: 3;
-  top: 2px;
-  left: 2px;
-  width: 31%;
-  height: 31%;
-  max-width: 14px;
-  max-height: 14px;
-  object-fit: contain;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45));
-}
-
-.rarityIcon {
-  position: absolute;
-  z-index: 3;
-  right: 0px;
-  bottom: 0px;
-  width: auto;
-  max-width: calc(100% - 4px);
-  height: min(22%, 12px);
-  object-fit: contain;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
-}
-
-.eliteIcon {
-  position: absolute;
-  z-index: 4;
-  bottom: 2px;
-  left: 2px;
-  width: auto;
-  max-width: 42%;
-  height: min(26%, 14px);
-  object-fit: contain;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
-}
-
-.fallbackPortrait {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-  min-height: 0;
-  color: #f8f7f0;
-  background: #526158;
-  font-size: 13px;
-  font-weight: 900;
-}
-
 .slotText {
   display: flex;
   min-width: 0;

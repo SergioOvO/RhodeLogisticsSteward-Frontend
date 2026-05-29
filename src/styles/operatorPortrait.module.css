@@ -1,0 +1,62 @@
+.frame {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  overflow: hidden;
+}
+
+.portrait {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.fallback {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: #f8f7f0;
+  background: #526158;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.professionIcon {
+  position: absolute;
+  z-index: 2;
+  top: 2px;
+  left: 2px;
+  width: 25%;
+  height: 25%;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45));
+}
+
+.rarityIcon {
+  position: absolute;
+  z-index: 2;
+  right: 2px;
+  bottom: 2px;
+  width: auto;
+  max-width: calc(100% - 4px);
+  height: 20%;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45));
+}
+
+.eliteIcon {
+  position: absolute;
+  z-index: 3;
+  bottom: 2px;
+  left: 2px;
+  width: 25%;
+  height: 25%;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+}

@@ -1,5 +1,6 @@
 import { useDraggable } from "@dnd-kit/core";
 import { DotsSixVerticalIcon } from "@phosphor-icons/react";
+import { OperatorPortrait } from "../shared/OperatorPortrait";
 import type { Dispatch, SetStateAction } from "react";
 import { filterOperators, type OperatorFilterState } from "../../domain/operatorFilters";
 import type { BuildingReference, Operator, SlotAddress } from "../../domain/types";
@@ -45,29 +46,12 @@ function DraggableOperatorCard({
       type="button"
     >
       <span className={styles.operatorPortraitFrame}>
-        {operator.portraitPath ? (
-          <img alt="" className={styles.operatorPortrait} loading="lazy" src={operator.portraitPath} />
-        ) : (
-          <span className={styles.operatorPortraitFallback}>{operator.name.slice(0, 2)}</span>
-        )}
-        {operator.professionIconPath ? (
-          <img
-            alt={operator.profession ?? ""}
-            className={styles.operatorMiniProfession}
-            data-profession-icon
-            loading="lazy"
-            src={operator.professionIconPath}
-          />
-        ) : null}
-        {operator.rarityIconPath ? (
-          <img
-            alt=""
-            className={styles.operatorMiniRarity}
-            data-rarity-icon
-            loading="lazy"
-            src={operator.rarityIconPath}
-          />
-        ) : null}
+        <OperatorPortrait
+          fallbackText={operator.name.slice(0, 2)}
+          portraitPath={operator.portraitPath}
+          professionIconPath={operator.professionIconPath}
+          rarityIconPath={operator.rarityIconPath}
+        />
       </span>
       <span className={styles.operatorCardName}>
         {operator.name}
