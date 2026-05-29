@@ -118,6 +118,42 @@
   line-height: 1;
 }
 
+.productionSummaryValue {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  min-width: 0;
+}
+
+.productionMetric {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 3px;
+}
+
+.productionIcon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+}
+
+.productionLabelText {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.productionSeparator {
+  color: #5e6b63;
+  margin-left: 2px;
+}
+
 .summaryLabel {
   display: block;
   color: #6d786f;
@@ -334,8 +370,18 @@
   padding-top: 17px;
 }
 
+.facilityColumn:first-child .facilityColumnTitle {
+  top: 12px;
+  left: 4px;
+  transform: none;
+}
+
 .facilityColumn:first-child .roomBlock:first-child {
-  padding-top: 20px;
+  padding-top: 26px;
+}
+
+.facilityColumn:first-child .roomBlock:first-child .roomTitle {
+  top: 18px;
 }
 
 .themeControl {
@@ -388,7 +434,7 @@
 }
 
 .slotGrid {
-  --slot-name-height: 10px;
+  --slot-name-height: 13px;
   --computed-slot-size: min(
     var(--slot-max-size, 40px),
     calc(var(--slot-inline-unit, 100cqw) - var(--slot-inline-gap-share, 0px)),
@@ -478,9 +524,9 @@
 .slotText {
   display: flex;
   min-width: 0;
-  height: var(--slot-name-height, 10px);
+  height: var(--slot-name-height, 13px);
   justify-content: center;
-  padding: 1px 2px 0;
+  padding: 2px 2px 0;
   background: transparent;
   border-radius: 0 0 2px 2px;
 }
@@ -488,9 +534,9 @@
 .operatorName,
 .slotHint {
   overflow: hidden;
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 900;
-  line-height: 1;
+  line-height: 1.05;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

@@ -12,6 +12,17 @@ interface CanvasHeaderProps {
   }) => void;
 }
 
+const productionIcons = [
+  { alt: "龙门币", key: "orderText", label: "订单", src: "/items/lmd.png" },
+  { alt: "赤金", key: "goldText", label: "赤金", src: "/items/gold.png" },
+  { alt: "中级作战记录", key: "recordText", label: "经验", src: "/items/exp-mid.png" },
+] as const;
+
+function productionValue(text: string): string {
+  const value = text.replace(/^(订单|赤金|经验)\s*/, "").trim();
+  return value || "-";
+}
+
 function markManual() {
   return "手动编辑数值";
 }
@@ -21,6 +32,8 @@ function productionLine(summary: ScheduleDocument["productionSummary"]) {
 }
 
 export function CanvasHeader({ document, onMetadataChange }: CanvasHeaderProps) {
+  const productionSummary = document.productionSummary;
+
   return (
     <header className={styles.header}>
       <div className={styles.titleBlock}>
@@ -42,21 +55,38 @@ export function CanvasHeader({ document, onMetadataChange }: CanvasHeaderProps) 
       <div className={styles.summary} aria-label="生产摘要">
         <div className={styles.productionLine}>
           <span className={styles.summaryLabel}>产出计算</span>
-          <EditableText
-            ariaLabel="产出计算"
-            className={styles.summaryValue}
-            onCommit={(orderText) =>
-              onMetadataChange({
-                productionSummary: {
-                  orderText,
-                  goldText: "",
-                  recordText: "",
-                  customLine: markManual(),
-                },
-              })
-            }
-            value={productionLine(document.productionSummary)}
-          />
+          <span
+            aria-label="产出计算"
+            className={[styles.summaryValue, styles.productionSummaryValue].join(" ")}
+            contentEditable
+            onBlur={(event) => {
+              const next = event.currentTarget.textContent?.trim() ?? "";
+              if (next && next !== productionLine(document.productionSummary)) {
+                onMetadataChange({
+                  productionSummary: {
+                    orderText: next,
+                    goldText: "",
+                    recordText: "",
+                    customLine: markManual(),
+                  },
+                });
+              }
+            }}
+            role="textbox"
+            suppressContentEditableWarning
+            tabIndex={0}
+          >
+            {productionIcons.map((item, index) => (
+              <span className={styles.productionMetric} key={item.key}>
+                <img alt={item.alt} className={styles.productionIcon} src={item.src} />
+                <span className={styles.productionLabelText}>{item.label}</span>
+                <span>{productionValue(productionSummary[item.key])}</span>
+                {index < productionIcons.length - 1 ? (
+                  <span aria-hidden="true" className={styles.productionSeparator}>·</span>
+                ) : null}
+              </span>
+            ))}
+          </span>
         </div>
         {document.productionSummary.customLine ? (
           <div className={styles.summaryNote}>
