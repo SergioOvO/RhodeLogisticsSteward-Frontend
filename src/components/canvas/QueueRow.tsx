@@ -48,18 +48,6 @@ export function QueueRow({
   return (
     <section className={styles.queueRow} data-queue-row={queue.id}>
       <div
-        aria-label="Queue index"
-        className={styles.queueIndexBadge}
-        data-queue-index-badge
-      >
-        <EditableText
-          ariaLabel="编辑队列名称"
-          className={styles.queueIndexItem}
-          onCommit={(label) => onQueueChange(queue.id, { label })}
-          value={queue.label}
-        />
-      </div>
-      <div
         className={styles.columns}
         style={{
           gridTemplateColumns: preset.columns
@@ -80,6 +68,18 @@ export function QueueRow({
             selectedSlot={selectedSlot}
           />
         ))}
+      </div>
+      <div
+        aria-label="Queue index"
+        className={styles.queueIndexBadge}
+        data-queue-index-badge
+      >
+        <EditableText
+          ariaLabel="编辑队列名称"
+          className={styles.queueIndexItem}
+          onCommit={(label) => onQueueChange(queue.id, { label })}
+          value={queue.label}
+        />
       </div>
     </section>
   );

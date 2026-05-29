@@ -189,29 +189,29 @@
 }
 
 .queueIndexBadge {
-  position: absolute;
+  position: relative;
   z-index: 9;
-  top: 4px;
-  left: 5px;
-  display: flex;
-  max-width: calc(100% - 12px);
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  place-items: center;
+  align-self: stretch;
+  justify-self: stretch;
   gap: 5px;
-  align-items: center;
-  padding: 1px 4px;
+  padding: 6px 8px;
   color: #17201b;
-  background: rgba(255, 253, 244, 0.88);
-  border: 1px solid rgba(40, 50, 44, 0.42);
-  border-radius: 2px;
-  box-shadow: 0 1px 0 rgba(255, 253, 244, 0.8);
+  background: rgba(229, 234, 220, 0.78);
+  border-left: 1px solid rgba(40, 50, 44, 0.36);
 }
 
 .queueIndexItem {
   overflow: hidden;
-  max-width: 72px;
+  max-width: 100%;
   font-family: var(--font-display);
-  font-size: 8px;
+  font-size: 15px;
   font-weight: 900;
-  line-height: 1.05;
+  line-height: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -220,7 +220,7 @@
   position: relative;
   display: grid;
   min-height: 0;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr) 94px;
   border-bottom: 0;
 }
 
