@@ -175,9 +175,9 @@ export const layoutPresets: LayoutPreset[] = [
       }),
     ],
     canvasProfile: canvasProfile(
-      { control: 1.2, trade: 1.18, gold: 1.95, record: 2.55, power: 1.0 },
-      { control: 1.15, trade: 1.12, gold: 1.95, record: 2.65, power: 0.98 },
-      { control: 1.08, trade: 1.05, gold: 1.98, record: 2.78, power: 0.9 },
+      { control: 1.2, trade: 1.15, gold: 1.05, record: 3.12, power: 1.05 },
+      { control: 1.12, trade: 1.08, gold: 1.0, record: 3.24, power: 0.95 },
+      { control: 1.04, trade: 1.0, gold: 0.92, record: 3.42, power: 0.82 },
     ),
     otherRooms,
   },

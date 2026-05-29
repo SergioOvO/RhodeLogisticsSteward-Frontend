@@ -41,6 +41,8 @@ export function OperatorTile({
   onSelect,
 }: OperatorTileProps) {
   const slotId = `slot:${address.queueId}:${address.assignmentId}:${address.slotIndex}`;
+  const displayName = slot.overrideName ?? operator?.name;
+  const isFilled = Boolean(displayName);
   const requiredElitePhase = getRequiredElitePhase(reference, operator, roomType, product);
   const displayElitePhase: ElitePhase | undefined = operator
     ? slot.elitePhase ?? (requiredElitePhase >= 2 ? 2 : requiredElitePhase >= 1 ? 1 : undefined)
@@ -59,9 +61,9 @@ export function OperatorTile({
     <button
       {...attributes}
       {...listeners}
-      aria-label={operator ? `编辑 ${operator.name}` : "选择干员"}
+      aria-label={displayName ? `编辑 ${displayName}` : "选择干员"}
       className={styles.operatorTile}
-      data-filled={Boolean(operator)}
+      data-filled={isFilled}
       data-operator-tile
       data-over={isOver}
       data-selected={selected}
@@ -76,7 +78,7 @@ export function OperatorTile({
         <OperatorPortrait
           eliteAlt={displayElitePhase ? `精英化${displayElitePhase}` : undefined}
           eliteIconPath={displayElitePhase ? eliteIconPaths[displayElitePhase] : undefined}
-          fallbackText={operator ? initials(operator.name) : String(slot.slotIndex + 1)}
+          fallbackText={displayName ? initials(displayName) : String(slot.slotIndex + 1)}
           portraitPath={operator?.portraitPath}
           professionAlt={operator?.profession ?? ""}
           professionIconPath={operator?.professionIconPath}
@@ -86,10 +88,14 @@ export function OperatorTile({
       </span>
       <span className={styles.slotText}>
         <span className={styles.operatorName} data-slot-name>
-          {slot.overrideName ?? operator?.name ?? "空位"}
+          {displayName ?? "空位"}
         </span>
         <span className={styles.slotHint}>
-          {operator ? `${operator.profession ?? "干员"} ${formatOperatorRarity(operator.rarity, "")}` : "点击选择"}
+          {operator
+            ? `${operator.profession ?? "干员"} ${formatOperatorRarity(operator.rarity, "")}`
+            : displayName
+              ? "未匹配，保留原名"
+              : "点击选择"}
         </span>
       </span>
     </button>

@@ -17,4 +17,17 @@ describe("mock calculator", () => {
 
     expect(calculateRoomPaperEfficiency(room)).toBe("纸面 +999%");
   });
+
+  it("counts imported text-only operators as filled slots", () => {
+    const room = {
+      ...createDefaultSchedule("243", 1).queues[0].roomAssignments[0],
+      operators: [
+        { slotIndex: 1, overrideName: "Unknown A" },
+        { slotIndex: 2 },
+        { slotIndex: 3, operatorId: "op-known" },
+      ],
+    };
+
+    expect(calculateRoomPaperEfficiency(room)).toBe("纸面 +31%");
+  });
 });

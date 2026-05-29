@@ -71,6 +71,7 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
   const [selectedSlot, setSelectedSlot] = useState<SlotAddress | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [fitZoom, setFitZoom] = useState(1);
   const [zoomOffset, setZoomOffset] = useState(0);
   const [dragUiVisible] = useState(true);
@@ -166,11 +167,13 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
     }
 
     try {
-      const next = await importScheduleJson(file, operators);
-      store.replaceDocument(next);
+      const result = await importScheduleJson(file, operators);
+      store.replaceDocument(result.document);
       setError("");
+      setNotice(result.message ?? "");
     } catch (importError) {
       setError(importError instanceof Error ? importError.message : "导入失败");
+      setNotice("");
     }
   }
 
@@ -254,6 +257,7 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
               </span>
             </div>
             {error ? <div className={styles.error}>{error}</div> : null}
+            {!error && notice ? <div className={styles.notice}>{notice}</div> : null}
             <ClearDropZone visible={dragUiVisible} />
             <div className={styles.canvasScroller} ref={canvasScrollerRef}>
               <div

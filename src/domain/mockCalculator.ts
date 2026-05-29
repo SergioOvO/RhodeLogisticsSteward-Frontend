@@ -1,12 +1,16 @@
 import { getLayoutPreset } from "../data/layoutPresets";
 import type { DroneSummary, ProductionSummary, RoomAssignment, ScheduleDocument } from "./types";
 
+function hasAssignedName(slot: RoomAssignment["operators"][number]): boolean {
+  return Boolean(slot.operatorId || slot.overrideName?.trim());
+}
+
 export function calculateRoomPaperEfficiency(assignment: RoomAssignment): string {
   if (assignment.paperEfficiencyLabel.trim()) {
     return assignment.paperEfficiencyLabel;
   }
 
-  const filled = assignment.operators.filter((slot) => slot.operatorId).length;
+  const filled = assignment.operators.filter(hasAssignedName).length;
   const base = assignment.roomType === "CONTROL" ? 7 : assignment.roomType === "POWER" ? 5 : 18;
   return `纸面 +${base + filled * 12}%`;
 }
@@ -16,7 +20,7 @@ export function calculateRoomEffectiveEfficiency(assignment: RoomAssignment): st
     return assignment.effectiveEfficiencyLabel;
   }
 
-  const filled = assignment.operators.filter((slot) => slot.operatorId).length;
+  const filled = assignment.operators.filter(hasAssignedName).length;
   const base = assignment.product === "Money" ? 82 : assignment.product === "CombatRecord" ? 76 : 68;
   return `折算 ${Math.min(140, base + filled * 9)}%`;
 }
@@ -33,7 +37,7 @@ export function calculateProductionSummary(document: ScheduleDocument): Producti
       sum +
       queue.roomAssignments.reduce(
         (queueSum, assignment) =>
-          queueSum + assignment.operators.filter((slot) => slot.operatorId).length,
+          queueSum + assignment.operators.filter(hasAssignedName).length,
         0,
       ),
     0,

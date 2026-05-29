@@ -382,6 +382,16 @@
   font-weight: 800;
 }
 
+.notice {
+  border: 1px solid #6f8f6a;
+  border-radius: var(--radius-sm);
+  padding: 9px 10px;
+  color: #254d2f;
+  background: #edf7e9;
+  font-size: 13px;
+  font-weight: 800;
+}
+
 .dropZone {
   display: none;
   border: 2px dashed #9f3131;
