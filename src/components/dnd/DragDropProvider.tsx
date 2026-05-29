@@ -52,6 +52,7 @@ function SquareDragPreview({ operator }: { operator: Operator }) {
         portraitPath={operator.portraitPath}
         professionIconPath={operator.professionIconPath}
         rarityIconPath={operator.rarityIconPath}
+        variant="drag"
       />
       <span className={styles.name}>{operator.name}</span>
     </div>

@@ -2,6 +2,7 @@ import { Dialog } from "@base-ui/react/dialog";
 import { XIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { filterOperators, type OperatorFilterState } from "../../domain/operatorFilters";
+import { formatOperatorRarity } from "../../domain/operatorPresentation";
 import type {
   BuildingReference,
   ElitePhase,
@@ -106,12 +107,21 @@ export function OperatorPickerDialog({
                 type="button"
               >
                 <span className={styles.pickerPortrait}>
-                  {operator.portraitPath ? <img alt="" loading="lazy" src={operator.portraitPath} /> : null}
+                  {operator.portraitPath ? (
+                    <img
+                      alt=""
+                      decoding="async"
+                      height={180}
+                      loading="lazy"
+                      src={operator.portraitPath}
+                      width={180}
+                    />
+                  ) : null}
                 </span>
                 <span>
                   <span className={styles.operatorCardName}>{operator.name}</span>
                   <span className={styles.operatorMeta}>
-                    {operator.profession ?? "干员"} · {operator.rarity ? `${operator.rarity+1}★` : "rarity ?"}
+                    {operator.profession ?? "干员"} · {formatOperatorRarity(operator.rarity)}
                   </span>
                   <span className={styles.tagRow}>
                     {operator.buildingSkills.slice(0, 3).map((skill) => (

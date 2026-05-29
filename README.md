@@ -35,7 +35,7 @@ bun run dev
 
 开发服务器启动后，按终端输出的本地地址访问页面。
 
-仓库已经包含生成后的 `public/` 静态数据和图片资源。只有在需要刷新干员、头像或基建数据时，才需要重新运行数据生成脚本。
+仓库已经包含生成后的 `public/` 静态数据和 WebP 图片资源，也包含 `assets/operator-source/` 下的原始 PNG 素材。只有在需要刷新干员、头像或基建数据时，才需要重新运行数据生成脚本。
 
 ## 刷新静态数据
 
@@ -48,12 +48,12 @@ bun run generate:data
 - `bun run generate:operators`
 - `bun run generate:building`
 
-默认数据来源是本机的以下路径：
+默认数据来源是仓库内素材和本机基建数据：
 
-- `D:\Code Rep\arknights\avatars`
+- `assets/operator-source`
 - `D:\Code Rep\arknights\arknights-building-data\data`
 
-如果你的数据目录不同，可以用环境变量覆盖：
+如果你的数据目录不同，可以用环境变量覆盖。`RLS_AVATARS_DIR` 需要指向包含 `operators.json`、`portraits/`、`profession/`、`rarity/` 和 `elite/` 的目录；旧的 `avatars/` 头像目录名也兼容。
 
 ```bash
 $env:RLS_AVATARS_DIR="D:\path\to\avatars"
@@ -67,7 +67,10 @@ bun run generate:data
 - `public/operators/portraits/`
 - `public/operators/profession/`
 - `public/operators/rarity/`
+- `public/operators/elite/`
 - `public/data/building-reference.json`
+
+`public/operators/` 是站点运行时资源目录，图片会由原始 PNG 转换为 WebP；原始 PNG 素材保留在 `assets/operator-source/`，方便查看和重新生成。
 
 ## 常用脚本
 

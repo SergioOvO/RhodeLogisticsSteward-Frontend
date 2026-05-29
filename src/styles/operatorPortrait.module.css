@@ -16,6 +16,14 @@
   object-position: center;
 }
 
+.frame[data-variant="tile"] .portrait,
+.frame[data-variant="drag"] .portrait {
+  width: 112%;
+  height: 112%;
+  object-fit: cover;
+  object-position: center 18%;
+}
+
 .fallback {
   display: grid;
   width: 100%;
@@ -27,27 +35,64 @@
   font-weight: 900;
 }
 
+.frame[data-variant="tile"] .fallback,
+.frame[data-variant="drag"] .fallback {
+  font-size: 14px;
+}
+
 .professionIcon {
   position: absolute;
   z-index: 2;
-  top: 2px;
-  left: 2px;
-  width: 25%;
-  height: 25%;
+  top: 4px;
+  left: 4px;
+  width: 17px;
+  height: 17px;
   object-fit: contain;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45));
+}
+
+.frame[data-variant="tile"] .professionIcon {
+  top: 2px;
+  left: 2px;
+  width: 31%;
+  height: 31%;
+  max-width: 14px;
+  max-height: 14px;
+}
+
+.frame[data-variant="drag"] .professionIcon {
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
 }
 
 .rarityIcon {
   position: absolute;
   z-index: 2;
-  right: 2px;
-  bottom: 2px;
+  right: 4px;
+  bottom: 4px;
   width: auto;
-  max-width: calc(100% - 4px);
-  height: 20%;
+  max-width: calc(100% - 8px);
+  height: 16px;
   object-fit: contain;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45));
+}
+
+.frame[data-variant="tile"] .rarityIcon {
+  right: 0;
+  bottom: 0;
+  max-width: calc(100% - 4px);
+  height: min(22%, 12px);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
+}
+
+.frame[data-variant="drag"] .rarityIcon {
+  right: 1px;
+  bottom: 10px;
+  max-width: calc(100% - 4px);
+  height: 12px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
 }
 
 .eliteIcon {
@@ -55,8 +100,9 @@
   z-index: 3;
   bottom: 2px;
   left: 2px;
-  width: 25%;
-  height: 25%;
+  width: auto;
+  max-width: 42%;
+  height: min(26%, 14px);
   object-fit: contain;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
 }

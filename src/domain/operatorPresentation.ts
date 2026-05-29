@@ -81,3 +81,7 @@ export function getRequiredElitePhase(
     0,
   );
 }
+
+export function formatOperatorRarity(rarity: number | undefined, fallback = "rarity ?"): string {
+  return typeof rarity === "number" ? `${rarity + 1}★` : fallback;
+}

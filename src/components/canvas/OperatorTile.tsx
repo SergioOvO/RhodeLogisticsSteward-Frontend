@@ -1,5 +1,5 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { getRequiredElitePhase } from "../../domain/operatorPresentation";
+import { formatOperatorRarity, getRequiredElitePhase } from "../../domain/operatorPresentation";
 import type {
   BuildingReference,
   ElitePhase,
@@ -11,8 +11,8 @@ import { OperatorPortrait } from "../shared/OperatorPortrait";
 import styles from "../../styles/canvas.module.css";
 
 const eliteIconPaths: Record<ElitePhase, string> = {
-  1: "/operators/elite/图标_升级_精英化1.png",
-  2: "/operators/elite/图标_升级_精英化2.png",
+  1: "/operators/elite/图标_升级_精英化1.webp",
+  2: "/operators/elite/图标_升级_精英化2.webp",
 };
 
 interface OperatorTileProps {
@@ -74,11 +74,14 @@ export function OperatorTile({
     >
       <span className={styles.portraitFrame} data-portrait-frame>
         <OperatorPortrait
+          eliteAlt={displayElitePhase ? `精英化${displayElitePhase}` : undefined}
           eliteIconPath={displayElitePhase ? eliteIconPaths[displayElitePhase] : undefined}
           fallbackText={operator ? initials(operator.name) : String(slot.slotIndex + 1)}
           portraitPath={operator?.portraitPath}
+          professionAlt={operator?.profession ?? ""}
           professionIconPath={operator?.professionIconPath}
           rarityIconPath={operator?.rarityIconPath}
+          variant="tile"
         />
       </span>
       <span className={styles.slotText}>
@@ -86,7 +89,7 @@ export function OperatorTile({
           {slot.overrideName ?? operator?.name ?? "空位"}
         </span>
         <span className={styles.slotHint}>
-          {operator ? `${operator.profession ?? "干员"} ${operator.rarity ? `${operator.rarity}★` : ""}` : "点击选择"}
+          {operator ? `${operator.profession ?? "干员"} ${formatOperatorRarity(operator.rarity, "")}` : "点击选择"}
         </span>
       </span>
     </button>

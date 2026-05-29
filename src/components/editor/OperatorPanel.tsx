@@ -48,7 +48,9 @@ function DraggableOperatorCard({
       <span className={styles.operatorPortraitFrame}>
         <OperatorPortrait
           fallbackText={operator.name.slice(0, 2)}
+          loading="lazy"
           portraitPath={operator.portraitPath}
+          professionAlt={operator.profession ?? ""}
           professionIconPath={operator.professionIconPath}
           rarityIconPath={operator.rarityIconPath}
         />

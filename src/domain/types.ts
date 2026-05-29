@@ -61,6 +61,9 @@ export interface OperatorManifest {
     generatedAt: string;
     metadataRows: number;
     portraitFiles: number;
+    professionIconFiles: number;
+    rarityIconFiles: number;
+    eliteIconFiles: number;
     warnings: string[];
   };
   operators: Operator[];
