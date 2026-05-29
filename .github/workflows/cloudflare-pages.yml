@@ -18,6 +18,9 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_PROJECT_NAME: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ZONE_ID: ${{ vars.CLOUDFLARE_ZONE_ID }}
+      CLOUDFLARE_CUSTOM_DOMAIN: ${{ vars.CLOUDFLARE_CUSTOM_DOMAIN }}
+      CLOUDFLARE_PAGES_HOST: ${{ vars.CLOUDFLARE_PAGES_HOST }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -41,3 +44,58 @@ jobs:
           --branch main
           --commit-hash "${{ github.sha }}"
           --commit-message "${{ github.event.head_commit.message }}"
+
+      - name: Configure custom domain
+        if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ZONE_ID != '' && env.CLOUDFLARE_CUSTOM_DOMAIN != '' && env.CLOUDFLARE_PAGES_HOST != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          api_base="https://api.cloudflare.com/client/v4"
+          auth_header="Authorization: Bearer ${CLOUDFLARE_API_TOKEN}"
+          content_header="Content-Type: application/json"
+
+          domain_body="$(jq -nc --arg name "$CLOUDFLARE_CUSTOM_DOMAIN" '{name: $name}')"
+          domain_response="$(curl -sS -X POST \
+            "$api_base/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/domains" \
+            -H "$auth_header" \
+            -H "$content_header" \
+            --data "$domain_body")"
+
+          if [ "$(echo "$domain_response" | jq -r '.success')" != "true" ]; then
+            if ! echo "$domain_response" | jq -r '.errors[].message' | grep -Eiq 'already exists|already been taken|domain.*exists'; then
+              echo "$domain_response"
+              exit 1
+            fi
+          fi
+
+          encoded_domain="$(python3 - <<'PY'
+          import os
+          import urllib.parse
+          print(urllib.parse.quote(os.environ["CLOUDFLARE_CUSTOM_DOMAIN"], safe=""))
+          PY
+          )"
+          records_response="$(curl -sS \
+            "$api_base/zones/$CLOUDFLARE_ZONE_ID/dns_records?type=CNAME&name=$encoded_domain" \
+            -H "$auth_header")"
+          record_id="$(echo "$records_response" | jq -r '.result[0].id // empty')"
+
+          record_body="$(jq -nc \
+            --arg type "CNAME" \
+            --arg name "$CLOUDFLARE_CUSTOM_DOMAIN" \
+            --arg content "$CLOUDFLARE_PAGES_HOST" \
+            '{type: $type, name: $name, content: $content, proxied: true, ttl: 1}')"
+
+          if [ -n "$record_id" ]; then
+            curl -sS -X PUT \
+              "$api_base/zones/$CLOUDFLARE_ZONE_ID/dns_records/$record_id" \
+              -H "$auth_header" \
+              -H "$content_header" \
+              --data "$record_body" | jq -e '.success == true'
+          else
+            curl -sS -X POST \
+              "$api_base/zones/$CLOUDFLARE_ZONE_ID/dns_records" \
+              -H "$auth_header" \
+              -H "$content_header" \
+              --data "$record_body" | jq -e '.success == true'
+          fi
