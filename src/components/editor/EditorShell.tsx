@@ -166,7 +166,7 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
     }
 
     try {
-      const next = await importScheduleJson(file);
+      const next = await importScheduleJson(file, operators);
       store.replaceDocument(next);
       setError("");
     } catch (importError) {
