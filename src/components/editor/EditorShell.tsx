@@ -154,7 +154,8 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
       const availableWidth = node.clientWidth - paddingInline;
 
       if (availableWidth > 0) {
-        setFitZoom(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, availableWidth / CANVAS_WIDTH)));
+        const nextFitZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, availableWidth / CANVAS_WIDTH));
+        setFitZoom((current) => (Math.abs(current - nextFitZoom) < 0.001 ? current : nextFitZoom));
       }
     };
 

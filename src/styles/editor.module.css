@@ -606,6 +606,7 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
+  scrollbar-gutter: stable;
   border: 1px solid rgba(80, 92, 84, 0.32);
   border-radius: var(--radius-md);
   background: #F5F5F5;
