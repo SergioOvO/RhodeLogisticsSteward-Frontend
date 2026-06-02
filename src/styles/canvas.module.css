@@ -1158,6 +1158,11 @@
   opacity: 1;
 }
 
+.posterComponent[data-poster-infrastructure-source="section"] .posterComponentHandle {
+  right: 4px;
+  left: auto;
+}
+
 .contextMenuPositioner {
   z-index: 1000;
   outline: none;

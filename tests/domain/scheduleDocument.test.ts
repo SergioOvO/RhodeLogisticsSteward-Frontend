@@ -174,35 +174,53 @@ describe("schedule document operations", () => {
         ...queue,
         roomAssignments: [],
       })),
-      posterCanvas: undefined,
+      posterCanvas: {
+        schemaVersion: 2 as const,
+        sourceTemplateId: "matrix" as const,
+        components: [],
+      },
     };
 
     const next = addInfrastructureComponent(emptyDocument, "TRADING");
+    const component = next.posterCanvas?.components.at(-1);
 
     expect(next.canvas.rooms).toHaveLength(1);
     expect(next.canvas.rooms[0]).toMatchObject({ roomType: "TRADING", roomIndex: 1 });
     expect(next.queues.every((queue) => queue.roomAssignments.length === 1)).toBe(true);
-    expect(next.posterCanvas?.components.at(-1)).toMatchObject({
+    expect(component).toMatchObject({
       type: "infrastructure",
       roomType: "TRADING",
-      roomNodeId: next.canvas.rooms[0].roomNodeId,
+      sectionId: "trade",
     });
-    expect(next.posterCanvas?.components.at(-1)?.rect).toMatchObject({
-      w: expect.any(Number),
-      h: expect.any(Number),
-    });
-    expect(next.posterCanvas!.components.at(-1)!.rect.w).toBeLessThanOrEqual(1800);
-    expect(next.posterCanvas!.components.at(-1)!.rect.h).toBeLessThanOrEqual(900);
+    expect(component?.roomNodeId).toBeUndefined();
+    expect(component?.rect.w).toBeGreaterThan(1800);
+    expect(component?.rect.h).toBeGreaterThan(900);
     expect(validateScheduleDocument(next)).toBe(true);
   });
 
   it("places dragged poster and room components near the drop center", () => {
     const poster = addPosterComponent(createDefaultSchedule("243", 3), "note", { x: 5000, y: 5000 });
     expect(poster.posterCanvas?.components.at(-1)?.rect).toMatchObject({
-      x: 3700,
-      y: 4450,
-      w: 2600,
-      h: 1100,
+      x: 2820,
+      y: 4800,
+      w: 4360,
+      h: 400,
+    });
+
+    const metric = addPosterComponent(createDefaultSchedule("243", 3), "metric", { x: 5000, y: 5000 });
+    expect(metric.posterCanvas?.components.at(-1)?.rect).toMatchObject({
+      x: 2820,
+      y: 4680,
+      w: 4360,
+      h: 640,
+    });
+
+    const divider = addPosterComponent(createDefaultSchedule("243", 3), "divider", { x: 5000, y: 5000 });
+    expect(divider.posterCanvas?.components.at(-1)?.rect).toMatchObject({
+      x: 220,
+      y: 4800,
+      w: 9560,
+      h: 400,
     });
 
     const document = createDefaultSchedule("243", 3);
@@ -216,16 +234,25 @@ describe("schedule document operations", () => {
         ...queue,
         roomAssignments: [],
       })),
-      posterCanvas: undefined,
+      posterCanvas: {
+        schemaVersion: 2 as const,
+        sourceTemplateId: "matrix" as const,
+        components: [],
+      },
     };
 
     const infrastructure = addInfrastructureComponent(emptyDocument, "TRADING", { x: 8000, y: 7000 });
-    expect(infrastructure.posterCanvas?.components.at(-1)?.rect).toMatchObject({
-      x: 7250,
-      y: 6620,
-      w: 1500,
-      h: 760,
+    expect(infrastructure.posterCanvas?.components.at(-1)).toMatchObject({
+      sectionId: "trade",
+      rect: {
+        x: expect.any(Number),
+        y: expect.any(Number),
+        w: expect.any(Number),
+        h: expect.any(Number),
+      },
     });
+    expect(infrastructure.posterCanvas!.components.at(-1)!.rect.w).toBeGreaterThan(1800);
+    expect(infrastructure.posterCanvas!.components.at(-1)!.rect.h).toBeGreaterThan(900);
 
     const room = addRoom(emptyDocument, "POWER", { x: 5.5, y: 3.5 });
     expect(room.canvas.rooms.at(-1)?.rect).toEqual({
@@ -236,17 +263,24 @@ describe("schedule document operations", () => {
     });
   });
 
-  it("binds repeated infrastructure poster components to different matching rooms first", () => {
-    const first = addInfrastructureComponent(createDefaultSchedule("243", 3), "MANUFACTURE");
+  it("adds repeated infrastructure poster components as section blocks", () => {
+    const base = {
+      ...createDefaultSchedule("243", 3),
+      posterCanvas: {
+        schemaVersion: 2 as const,
+        sourceTemplateId: "matrix" as const,
+        components: [],
+      },
+    };
+    const first = addInfrastructureComponent(base, "MANUFACTURE");
     const second = addInfrastructureComponent(first, "MANUFACTURE");
     const manualComponents = second.posterCanvas!.components.filter(
-      (component) => component.type === "infrastructure" && "roomNodeId" in component,
+      (component) => component.type === "infrastructure",
     );
 
     expect(manualComponents).toHaveLength(2);
-    expect(new Set(manualComponents.map((component) => (component as { roomNodeId?: string }).roomNodeId)).size).toBe(
-      2,
-    );
+    expect(manualComponents.every((component) => component.sectionId)).toBe(true);
+    expect(manualComponents.every((component) => component.roomNodeId === undefined)).toBe(true);
     expect(validateScheduleDocument(second)).toBe(true);
   });
 });

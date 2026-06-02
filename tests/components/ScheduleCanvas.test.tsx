@@ -1,9 +1,9 @@
 import { DndContext } from "@dnd-kit/core";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ScheduleCanvas } from "../../src/components/canvas/ScheduleCanvas";
 import { createDefaultSchedule } from "../../src/domain/createDefaultSchedule";
-import { assignOperator } from "../../src/domain/scheduleDocument";
+import { addInfrastructureComponent, assignOperator } from "../../src/domain/scheduleDocument";
 import type { BuildingReference, Operator, ScheduleDocument } from "../../src/domain/types";
 
 const operator: Operator = {
@@ -76,6 +76,20 @@ function manualManufacturePosterDocument(): ScheduleDocument {
       ],
     } as ScheduleDocument["posterCanvas"],
   };
+}
+
+function manualSectionPosterDocument(): ScheduleDocument {
+  return addInfrastructureComponent(
+    {
+      ...createDefaultSchedule("243", 1),
+      posterCanvas: {
+        schemaVersion: 2,
+        sourceTemplateId: "matrix",
+        components: [],
+      },
+    },
+    "MANUFACTURE",
+  );
 }
 
 describe("ScheduleCanvas", () => {
@@ -215,6 +229,31 @@ describe("ScheduleCanvas", () => {
     expect(component).toHaveTextContent("制造站 1");
     expect(component).toHaveTextContent("赤金");
     expect(component.querySelector("[data-poster-slot]")).toBeNull();
+  });
+
+  it("renders dropped infrastructure as an editable section with operator slots", () => {
+    const onPosterComponentContentChange = vi.fn();
+    const onSlotSelect = vi.fn();
+    const document = manualSectionPosterDocument();
+    const { container } = renderCanvas(document, {
+      onPosterComponentContentChange,
+      onSlotSelect,
+    });
+    const component = container.querySelector("[data-poster-component-type='infrastructure']") as HTMLElement;
+    const componentId = component.dataset.posterComponentId!;
+
+    expect(component).toHaveAttribute("data-poster-infrastructure-source", "section");
+    expect(component.querySelector("[data-poster-compact-infrastructure]")).toBeNull();
+    expect(component.querySelectorAll("[data-poster-slot]").length).toBeGreaterThan(0);
+
+    const title = within(component).getByRole("textbox", { name: /编辑.*标题/ });
+    title.textContent = "手动制造区";
+    fireEvent.blur(title);
+
+    expect(onPosterComponentContentChange).toHaveBeenCalledWith(componentId, { title: "手动制造区" });
+
+    fireEvent.click(component.querySelector("[data-poster-slot]")!);
+    expect(onSlotSelect).toHaveBeenCalled();
   });
 
   it("changes a compact manufacturing poster component product from its context submenu", async () => {

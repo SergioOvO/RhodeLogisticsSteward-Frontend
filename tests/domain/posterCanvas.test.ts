@@ -22,8 +22,9 @@ describe("poster canvas", () => {
     expect(canvas.schemaVersion).toBe(2);
     expect(canvas.sourceTemplateId).toBe("matrix");
     expect(canvas.components.map((component) => component.type)).toEqual(
-      expect.arrayContaining(["infrastructure", "laneLabel", "metric", "note", "divider"]),
+      expect.arrayContaining(["infrastructure", "laneLabel", "metric", "divider"]),
     );
+    expect(canvas.components.map((component) => component.type)).not.toEqual(expect.arrayContaining(["note"]));
     expect(canvas.components.map((component) => component.type)).not.toEqual(
       expect.arrayContaining(["facility", "facilityGroup"]),
     );
@@ -35,9 +36,11 @@ describe("poster canvas", () => {
     const canvas = buildDefaultPosterCanvas(document);
 
     expect(canvas.components.map((component) => component.id)).toEqual(
-      expect.arrayContaining(["metric:title", "metric:production", "metric:drone", "note:summary"]),
+      expect.arrayContaining(["metric:title", "metric:production", "metric:drone"]),
     );
+    expect(canvas.components.map((component) => component.id)).not.toEqual(expect.arrayContaining(["note:summary"]));
     expect(canvas.components.find((component) => component.id === "metric:title")?.title).toBe(document.title);
+    expect(canvas.components.find((component) => component.id === "metric:production")?.rect.h).toBe(640);
 
     const facilityGroups = canvas.components
       .filter((component) => component.type === "infrastructure" && component.sectionId)
@@ -121,14 +124,14 @@ describe("poster canvas", () => {
 
   it("updates editable poster component title and text", () => {
     const document = regeneratePosterCanvas(createDefaultSchedule("243", 3));
-    const updated = updatePosterComponentContent(document, "note:summary", {
-      title: "自定义备注",
-      text: "宽松布局说明",
+    const updated = updatePosterComponentContent(document, "metric:production", {
+      title: "自定义产出",
+      text: "订单 / 赤金 / 经验",
     });
 
-    expect(updated.posterCanvas?.components.find((component) => component.id === "note:summary")).toMatchObject({
-      title: "自定义备注",
-      text: "宽松布局说明",
+    expect(updated.posterCanvas?.components.find((component) => component.id === "metric:production")).toMatchObject({
+      title: "自定义产出",
+      text: "订单 / 赤金 / 经验",
     });
     expect(validateScheduleDocument(JSON.parse(JSON.stringify(updated)))).toBe(true);
   });

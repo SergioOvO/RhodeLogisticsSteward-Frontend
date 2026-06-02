@@ -20,6 +20,19 @@ const POSTER_LANE_TOP = 1120;
 const POSTER_DIVIDER_TOP = 1540;
 const POSTER_SECTION_TOP = 2020;
 
+export const DEFAULT_POSTER_COMPONENT_RECTS = {
+  title: { x: POSTER_MARGIN, y: 180, w: 2700, h: 640 },
+  production: { x: 3060, y: 180, w: 4360, h: 640 },
+  drone: { x: 7580, y: 180, w: 2200, h: 640 },
+  note: { x: 3060, y: 640, w: 4360, h: 400 },
+  divider: {
+    x: POSTER_MARGIN,
+    y: POSTER_DIVIDER_TOP,
+    w: POSTER_COORD_MAX - POSTER_MARGIN * 2,
+    h: 400,
+  },
+} as const satisfies Record<string, PosterRect>;
+
 const componentTypes = [
   "infrastructure",
   "laneLabel",
@@ -126,7 +139,6 @@ export function buildDefaultPosterCanvas(document: ScheduleDocument): PosterCanv
   const view = buildPosterViewModel(document);
   const components: PosterComponent[] = [];
   const sectionRects = strictSectionRects(view.sections);
-  const noteText = view.notes.join(" · ");
 
   components.push(
     {
@@ -135,7 +147,7 @@ export function buildDefaultPosterCanvas(document: ScheduleDocument): PosterCanv
       title: document.title,
       text: document.subtitle,
       metricId: "title",
-      rect: { x: POSTER_MARGIN, y: 180, w: 2700, h: 640 },
+      rect: DEFAULT_POSTER_COMPONENT_RECTS.title,
       zIndex: 10,
     },
     {
@@ -144,7 +156,7 @@ export function buildDefaultPosterCanvas(document: ScheduleDocument): PosterCanv
       title: "产出计算",
       text: productionLine(document),
       metricId: "production",
-      rect: { x: 3060, y: 180, w: 4360, h: 400 },
+      rect: DEFAULT_POSTER_COMPONENT_RECTS.production,
       zIndex: 10,
     },
     {
@@ -153,22 +165,14 @@ export function buildDefaultPosterCanvas(document: ScheduleDocument): PosterCanv
       title: view.metrics[1]?.label ?? "无人机加速",
       text: document.droneSummary.summaryText,
       metricId: "drone",
-      rect: { x: 7580, y: 180, w: 2200, h: 640 },
+      rect: DEFAULT_POSTER_COMPONENT_RECTS.drone,
       zIndex: 10,
-    },
-    {
-      id: "note:summary",
-      type: "note",
-      title: "备注",
-      text: noteText,
-      rect: { x: 3060, y: 640, w: 4360, h: 400 },
-      zIndex: 11,
     },
     {
       id: "divider:header",
       type: "divider",
       title: "分隔线",
-      rect: { x: POSTER_MARGIN, y: POSTER_DIVIDER_TOP, w: POSTER_COORD_MAX - POSTER_MARGIN * 2, h: 400 },
+      rect: DEFAULT_POSTER_COMPONENT_RECTS.divider,
       zIndex: 5,
     },
   );

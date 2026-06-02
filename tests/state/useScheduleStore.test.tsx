@@ -50,15 +50,15 @@ describe("useScheduleStore poster canvas history", () => {
     const { result } = renderHook(() => useScheduleStore(initial));
 
     act(() => {
-      result.current.updatePosterComponentContent("note:summary", {
-        title: "自定义备注",
-        text: "外层工具栏不会遮挡海报",
+      result.current.updatePosterComponentContent("metric:production", {
+        title: "自定义产出",
+        text: "订单 / 赤金 / 经验",
       });
     });
 
-    expect(result.current.document.posterCanvas?.components.find((component) => component.id === "note:summary")).toMatchObject({
-      title: "自定义备注",
-      text: "外层工具栏不会遮挡海报",
+    expect(result.current.document.posterCanvas?.components.find((component) => component.id === "metric:production")).toMatchObject({
+      title: "自定义产出",
+      text: "订单 / 赤金 / 经验",
     });
     expect(result.current.canUndoPosterCanvas).toBe(true);
 
@@ -66,8 +66,8 @@ describe("useScheduleStore poster canvas history", () => {
       result.current.undoPosterCanvas();
     });
 
-    expect(result.current.document.posterCanvas?.components.find((component) => component.id === "note:summary")?.title).not.toBe(
-      "自定义备注",
+    expect(result.current.document.posterCanvas?.components.find((component) => component.id === "metric:production")?.title).not.toBe(
+      "自定义产出",
     );
   });
 

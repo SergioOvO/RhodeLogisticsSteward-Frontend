@@ -9,6 +9,7 @@ import { createBentoRoomNode, createBentoSchedule, createRoomAssignment } from "
 import {
   buildDefaultPosterCanvas,
   clampPosterRect,
+  DEFAULT_POSTER_COMPONENT_RECTS,
   normalizePosterCanvas,
   validatePosterCanvas,
 } from "./posterCanvas";
@@ -348,7 +349,7 @@ export function updatePosterComponentContent(
   patch: PosterComponentContentPatch,
 ): ScheduleDocument {
   const posterCanvas = currentPosterCanvas(document);
-  const editableTypes = new Set<PosterComponentType>(["metric", "note", "laneLabel"]);
+  const editableTypes = new Set<PosterComponentType>(["metric", "note", "laneLabel", "infrastructure"]);
 
   return stamp({
     ...document,
@@ -429,7 +430,6 @@ export function addPosterComponent(
   const posterCanvas = currentPosterCanvas(document);
   const view = buildPosterViewModel(document);
   const zIndex = nextPosterZIndex(posterCanvas.components);
-  const baseRect = { x: 600, y: 760, w: 2600, h: 1100 };
   let component: PosterComponent | null = null;
 
   if (kind === "metric") {
@@ -438,7 +438,7 @@ export function addPosterComponent(
       type: "metric",
       title: "产出摘要",
       text: view.metrics.map((metric) => `${metric.label}: ${metric.value}`).join(" / "),
-      rect: posterRectFromCenter(baseRect, center),
+      rect: posterRectFromCenter(DEFAULT_POSTER_COMPONENT_RECTS.production, center),
       zIndex,
     };
   } else if (kind === "note") {
@@ -447,7 +447,7 @@ export function addPosterComponent(
       type: "note",
       title: "文本备注",
       text: "自定义备注",
-      rect: posterRectFromCenter(baseRect, center),
+      rect: posterRectFromCenter(DEFAULT_POSTER_COMPONENT_RECTS.note, center),
       zIndex,
     };
   } else if (kind === "divider") {
@@ -455,7 +455,7 @@ export function addPosterComponent(
       id: nextPosterComponentId(posterCanvas.components, kind, "manual"),
       type: "divider",
       title: "分隔线",
-      rect: posterRectFromCenter({ x: 600, y: 1600, w: 3600, h: 400 }, center),
+      rect: posterRectFromCenter(DEFAULT_POSTER_COMPONENT_RECTS.divider, center),
       zIndex,
     };
   }
@@ -471,6 +471,20 @@ export function addPosterComponent(
       components: [...posterCanvas.components, component],
     },
   });
+}
+
+function sectionForRoom(document: ScheduleDocument, room: BentoRoomNode) {
+  return buildPosterViewModel(document).sections.find((section) =>
+    section.blocks.some((block) => block.roomNodeId === room.roomNodeId),
+  );
+}
+
+function defaultSectionRect(document: ScheduleDocument, sectionId: string): PosterRect {
+  const defaultComponent = buildDefaultPosterCanvas(document).components.find(
+    (component) => component.type === "infrastructure" && component.sectionId === sectionId,
+  );
+
+  return defaultComponent?.rect ?? { x: 600, y: 760, w: 2600, h: 1100 };
 }
 
 export function addInfrastructureComponent(
@@ -493,14 +507,19 @@ export function addInfrastructureComponent(
     return document;
   }
 
+  const section = sectionForRoom(documentWithRoom, sourceRoom);
+  if (!section) {
+    return document;
+  }
+
   const zIndex = nextPosterZIndex(posterCanvas.components);
   const component: PosterComponent = {
-    id: nextPosterComponentId(posterCanvas.components, "infrastructure", sourceRoom.roomNodeId),
+    id: nextPosterComponentId(posterCanvas.components, "infrastructure", `manual:${section.id}`),
     type: "infrastructure",
-    title: sourceRoom.label,
-    roomNodeId: sourceRoom.roomNodeId,
+    title: section.title,
+    sectionId: section.id,
     roomType: sourceRoom.roomType,
-    rect: posterRectFromCenter({ x: 600, y: 760, w: 1500, h: 760 }, center),
+    rect: posterRectFromCenter(defaultSectionRect(documentWithRoom, section.id), center),
     zIndex,
   };
 

@@ -210,13 +210,15 @@ test("empty poster canvas accepts dragged infrastructure templates", async ({ pa
   const placed = await component.evaluate((node) => ({
     left: Number.parseFloat((node as HTMLElement).style.left),
     top: Number.parseFloat((node as HTMLElement).style.top),
+    width: Number.parseFloat((node as HTMLElement).style.width),
+    height: Number.parseFloat((node as HTMLElement).style.height),
   }));
-  expect(placed.left).toBeCloseTo(42.5, 1);
-  expect(placed.top).toBeCloseTo(46.2, 1);
-  await expect(component).toHaveAttribute("data-poster-infrastructure-source", "room");
-  await expect(component.locator("[data-poster-compact-infrastructure]")).toHaveCount(1);
-  await expect(component.locator("[data-room-node-id='trading-1']")).toHaveCount(1);
-  await expect(component.locator("[data-poster-slot]")).toHaveCount(0);
+  expect(placed.width).toBeGreaterThan(18);
+  expect(placed.height).toBeGreaterThan(40);
+  await expect(component).toHaveAttribute("data-poster-infrastructure-source", "section");
+  await expect(component.locator("[data-poster-compact-infrastructure]")).toHaveCount(0);
+  await expect(component.locator("[data-room-node-id='trading-1']")).toHaveCount(3);
+  await expect(component.locator("[data-poster-slot]").first()).toBeVisible();
   await expect(component.locator("[data-portrait-frame]")).toHaveCount(0);
 
   await expect
@@ -224,12 +226,13 @@ test("empty poster canvas accepts dragged infrastructure templates", async ({ pa
       page.evaluate(() => {
         const draft = JSON.parse(window.localStorage.getItem("rhode-logistics-schedule-draft-v2") ?? "{}");
         return {
+          componentSectionId: draft.posterCanvas?.components?.[0]?.sectionId,
           componentRoomNodeId: draft.posterCanvas?.components?.[0]?.roomNodeId,
           roomType: draft.canvas?.rooms?.[0]?.roomType,
         };
       }),
     )
-    .toEqual({ componentRoomNodeId: "trading-1", roomType: "TRADING" });
+    .toEqual({ componentSectionId: "trade", componentRoomNodeId: undefined, roomType: "TRADING" });
 });
 
 test("empty poster canvas places dragged text components at the drop point", async ({ page }) => {
@@ -247,8 +250,8 @@ test("empty poster canvas places dragged text components at the drop point", asy
     left: Number.parseFloat((node as HTMLElement).style.left),
     top: Number.parseFloat((node as HTMLElement).style.top),
   }));
-  expect(placed.left).toBeCloseTo(37, 1);
-  expect(placed.top).toBeCloseTo(44.5, 1);
+  expect(placed.left).toBeCloseTo(28.2, 1);
+  expect(placed.top).toBeCloseTo(48, 1);
 
   const editable = component.getByRole("textbox").first();
   await editable.click();
@@ -273,7 +276,7 @@ test("empty poster canvas places dragged text components at the drop point", asy
     });
 });
 
-test("compact manufacturing poster component changes product from its submenu", async ({ page }) => {
+test("dropped manufacturing poster section stays editable and slot-clickable", async ({ page }) => {
   await page.goto("/sample/243");
 
   await dragTo(
@@ -282,33 +285,32 @@ test("compact manufacturing poster component changes product from its submenu", 
     page.locator("[data-poster-canvas]"),
   );
 
-  const component = page.locator("[data-poster-infrastructure-source='room']").last();
+  const component = page.locator("[data-poster-infrastructure-source='section']").last();
   await expect(component).toBeVisible();
-  await expect(component).toContainText("制造站 1");
-  await expect(component.locator("[data-poster-compact-infrastructure]")).toHaveCount(1);
-  await expect(component.locator("[data-poster-slot]")).toHaveCount(0);
+  await expect(component.locator("[data-poster-compact-infrastructure]")).toHaveCount(0);
+  await expect(component.locator("[data-poster-slot]").first()).toBeVisible();
 
-  await component.click({ button: "right" });
-  const productMenu = page.locator("[data-poster-component-menu-item='manufacture-product']");
-  await expect(productMenu).toBeVisible();
-  await productMenu.hover();
-  await page.locator("[data-product-option='CombatRecord']").click();
+  const title = component.getByRole("textbox", { name: /编辑.*标题/ }).first();
+  await title.click();
+  await page.keyboard.press(process.platform === "darwin" ? "Meta+A" : "Control+A");
+  await page.keyboard.type("手动制造区");
+  await page.locator("[data-poster-canvas]").click({ position: { x: 5, y: 5 } });
+  await expect(title).toHaveText("手动制造区");
 
-  await expect(component).toContainText("经验");
+  await component.locator("[data-poster-slot]").first().click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+
   await expect
     .poll(async () =>
       page.evaluate(() => {
         const draft = JSON.parse(window.localStorage.getItem("rhode-logistics-schedule-draft-v2") ?? "{}");
         const component = draft.posterCanvas?.components?.find(
-          (item: { roomNodeId?: string }) => item.roomNodeId === "manufacture-1",
+          (item: { sectionId?: string; title?: string }) => item.title === "手动制造区" && item.sectionId,
         );
-        const room = draft.canvas?.rooms?.find(
-          (item: { roomNodeId?: string }) => item.roomNodeId === "manufacture-1",
-        );
-        return { componentRoomNodeId: component?.roomNodeId, product: room?.product };
+        return { sectionId: component?.sectionId, roomNodeId: component?.roomNodeId, title: component?.title };
       }),
     )
-    .toEqual({ componentRoomNodeId: "manufacture-1", product: "CombatRecord" });
+    .toEqual({ sectionId: "gold", roomNodeId: undefined, title: "手动制造区" });
 });
 
 test("guide toggle hides the card template guide grid", async ({ page }) => {

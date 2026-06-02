@@ -533,7 +533,12 @@ export function PosterCanvas({
     return (
       <div className={styles.posterFacilityGroupBody}>
         <header className={styles.posterSectionHeader}>
-          <span>{component.title}</span>
+          <EditableText
+            ariaLabel={`编辑${component.title}标题`}
+            as="span"
+            onCommit={(title) => onPosterComponentContentChange(component.id, { title })}
+            value={component.title}
+          />
           {section.product ? <span>{productLabel(section.product)}</span> : null}
         </header>
         <div
