@@ -17,6 +17,28 @@ import type {
 import styles from "../../styles/editor.module.css";
 import { ContourButton } from "../ui/ContourButton";
 
+const ROOM_TYPE_LABEL: Record<string, string> = {
+  CONTROL: "控制中枢",
+  POWER: "发电站",
+  MANUFACTURE: "制造站",
+  TRADING: "贸易站",
+  DORMITORY: "宿舍",
+  HIRE: "办公室",
+  MEETING: "会客室",
+  TRAINING: "训练室",
+  WORKSHOP: "加工站",
+};
+
+const FORMULA_TYPE_LABEL: Record<string, string> = {
+  F_EXP: "作战记录",
+  F_GOLD: "赤金",
+  F_ASC: "芯片/双芯片",
+  F_DIAMOND: "源石碎片", //源石碎片/合成玉
+  F_BUILDING: "基建材料",
+  F_EVOLVE: "精英化材料",
+  F_SKILL: "技能材料",
+};
+
 interface OperatorPickerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -222,17 +244,20 @@ export function OperatorPickerDialog({
                     {operator.profession ?? "干员"} · {formatOperatorRarity(operator.rarity)}
                   </span>
                   <span className={styles.tagRow}>
-                    {operator.buildingSkills.slice(0, 3).map((skill) => (
-                      <span className={styles.tag} key={`${operator.id}-${skill.buffId}`}>
-                        {skill.roomType}
-                      </span>
-                    ))}
-                    {operator.buildingSkills
-                      .flatMap((skill) => skill.targetFormulaTypes)
+                    {[...new Set(operator.buildingSkills.map((s) => ROOM_TYPE_LABEL[s.roomType] ?? s.roomType))]
+                      .slice(0, 3)
+                      .map((label) => (
+                        <span className={styles.tag} key={`${operator.id}-room-${label}`}>
+                          {label}
+                        </span>
+                      ))}
+                    {[...new Set(
+                      operator.buildingSkills.flatMap((s) => s.targetFormulaTypes.map((t) => FORMULA_TYPE_LABEL[t] ?? t)),
+                    )]
                       .slice(0, 2)
-                      .map((formulaType) => (
-                        <span className={styles.tag} key={`${operator.id}-${formulaType}`}>
-                          {formulaType}
+                      .map((label) => (
+                        <span className={styles.tag} key={`${operator.id}-formula-${label}`}>
+                          {label}
                         </span>
                       ))}
                   </span>
