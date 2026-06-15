@@ -1669,8 +1669,12 @@
   background: #ffede0;
 }
 
-.posterRoomBlock[data-product="OriginStone"] {
+.posterRoomBlock[data-room-type="MANUFACTURE"][data-product="OriginStone"] {
   background: #ffd6b2;
+}
+
+.posterRoomBlock[data-room-type="TRADING"][data-product="OriginStone"] {
+  background: #bde0f8
 }
 
 .posterRoomBlock[data-room-type="TRADING"],
