@@ -106,8 +106,6 @@ export function OperatorPickerDialog({
   const [filters, setFilters] = useState<OperatorFilterState>(() =>
     createInitialFilters(selectedRoomType, selectedProduct),
   );
-  const canEditElitePhase = Boolean(selectedSlotAssignment?.operatorId);
-
   useEffect(() => {
     if (!open) {
       return undefined;
@@ -143,20 +141,18 @@ export function OperatorPickerDialog({
                 value={filters.text}
               />
             </label>
-            {canEditElitePhase ? (
-              <label className={styles.field}>
-                <span className={styles.fieldLabel}>精英状态</span>
-                <select
-                  className={[styles.selectTrigger, styles.eliteSelect].join(" ")}
-                  onChange={(event) => onElitePhaseChange(parseElitePhase(event.target.value))}
-                  value={selectedSlotAssignment?.elitePhase ? String(selectedSlotAssignment.elitePhase) : "auto"}
-                >
-                  <option value="auto">自动</option>
-                  <option value="1">精一</option>
-                  <option value="2">精二</option>
-                </select>
-              </label>
-            ) : null}
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>精英状态</span>
+              <select
+                className={[styles.selectTrigger, styles.eliteSelect].join(" ")}
+                onChange={(event) => onElitePhaseChange(parseElitePhase(event.target.value))}
+                value={selectedSlotAssignment?.elitePhase ? String(selectedSlotAssignment.elitePhase) : "auto"}
+              >
+                <option value="auto">自动</option>
+                <option value="1">精一</option>
+                <option value="2">精二</option>
+              </select>
+            </label>
           </div>
           <div className={styles.dialogFilterBar}>
             <div className={styles.filterGroup}>

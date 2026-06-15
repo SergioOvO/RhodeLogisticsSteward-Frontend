@@ -10,9 +10,12 @@ import { useDroppable } from "@dnd-kit/core";
 import {
   buildDefaultPosterCanvas,
   clampPosterRect,
+  columnThemeMap,
+  getPosterColumns,
   MIN_POSTER_COMPONENT_SIZE,
   normalizePosterCanvas,
   POSTER_COORD_MAX,
+  type PosterColumnDef,
 } from "../../domain/posterCanvas";
 import { buildPosterViewModel, type PosterBlock, type PosterSection } from "../../domain/posterViewModel";
 import type { PosterComponentContentPatch } from "../../domain/scheduleDocument";
@@ -27,6 +30,10 @@ import type {
   ScheduleDocument,
   SlotAddress,
 } from "../../domain/types";
+import {
+  calculateRoomEffectiveEfficiency,
+  calculateRoomPaperEfficiency,
+} from "../../domain/mockCalculator";
 import styles from "../../styles/canvas.module.css";
 import { BentoCanvas } from "./BentoCanvas";
 import { EditableText } from "./EditableText";
@@ -42,6 +49,7 @@ interface PosterCanvasProps {
   onRoomResize: (roomNodeId: string, rect: GridRect) => void;
   onRoomProductChange: (roomNodeId: string, product?: ProductKind) => void;
   onRoomRemove: (roomNodeId: string) => void;
+  onRoomEfficiencyLabelsChange: (queueId: string, assignmentId: string, labels: { paperEfficiencyLabel?: string; effectiveEfficiencyLabel?: string }) => void;
   onPosterComponentRectChange: (componentId: string, rect: PosterRect) => void;
   onPosterComponentContentChange: (componentId: string, patch: PosterComponentContentPatch) => void;
   onPosterComponentDelete: (componentId: string) => void;
@@ -85,6 +93,17 @@ const sectionTheme: Record<PosterSection["kind"], string> = {
   other: styles.posterThemeOther,
 };
 
+const columnThemeStyles: Record<string, string> = {
+  control: styles.posterThemeControl,
+  trade: styles.posterThemeTrade,
+  gold: styles.posterThemeGold,
+  record: styles.posterThemeRecord,
+  manufacture: styles.posterThemeManufacture,
+  power: styles.posterThemePower,
+  other: styles.posterThemeOther,
+  jade: styles.posterThemeJade,
+};
+
 const primaryPointerButton = 0;
 const dragThresholdPx = 6;
 const POSTER_GUIDE_COLUMNS = 24;
@@ -94,6 +113,11 @@ const manufactureProductOptions = [
   { value: "PureGold", label: "赤金" },
   { value: "CombatRecord", label: "作战记录" },
   { value: "OriginStone", label: "源石碎片" },
+] as const satisfies readonly { value: ProductKind; label: string }[];
+
+const tradingProductOptions = [
+  { value: "Money", label: "龙门币" },
+  { value: "OriginStone", label: "合成玉" },
 ] as const satisfies readonly { value: ProductKind; label: string }[];
 const resizeEdges = ["top", "right", "bottom", "left"] as const satisfies readonly ResizeEdge[];
 const resizeEdgeClasses: Record<ResizeEdge, string> = {
@@ -133,10 +157,10 @@ function componentStyle(rect: PosterRect, zIndex: number): CSSProperties {
   };
 }
 
-function componentClasses(component: PosterComponent, section?: PosterSection) {
+function componentClasses(component: PosterComponent, themeClass?: string) {
   return [
     styles.posterComponent,
-    component.type === "infrastructure" && section ? sectionTheme[section.kind] : "",
+    component.type === "infrastructure" && themeClass ? themeClass : "",
     component.type === "metric" ? styles.posterComponentMetric : "",
     component.type === "note" ? styles.posterComponentNote : "",
     component.type === "laneLabel" ? styles.posterComponentLane : "",
@@ -274,6 +298,7 @@ export function PosterCanvas({
   onRoomResize,
   onRoomProductChange,
   onRoomRemove,
+  onRoomEfficiencyLabelsChange,
   onPosterComponentRectChange,
   onPosterComponentContentChange,
   onPosterComponentDelete,
@@ -302,6 +327,8 @@ export function PosterCanvas({
     () => new Map(view.sections.map((section) => [section.id, section])),
     [view.sections],
   );
+  const columns = useMemo(() => getPosterColumns(document.layoutId), [document.layoutId]);
+  const columnMap = useMemo(() => new Map(columns.map((col) => [col.id, col])), [columns]);
   const { setNodeRef: setPosterDropRef, isOver: isPosterDropOver } = useDroppable({
     id: "poster-canvas",
     data: { type: "poster-canvas" },
@@ -558,6 +585,102 @@ export function PosterCanvas({
     );
   }
 
+  function renderSingleRoom(component: PosterComponent) {
+    const room = document.canvas.rooms.find((candidate) => candidate.roomNodeId === component.roomNodeId);
+    if (!room) {
+      return null;
+    }
+
+    return (
+      <div className={styles.posterSingleRoom} data-poster-single-room data-product={room.product}>
+        <header className={styles.posterRoomHeader}>
+          <span className={styles.posterRoomName}>{room.label}</span>
+          {room.roomType === "MANUFACTURE" ? (
+            <select
+              className={styles.posterProductSelect}
+              onChange={(e) => onRoomProductChange(room.roomNodeId, e.target.value as ProductKind)}
+              onPointerDown={(e) => e.stopPropagation()}
+              value={room.product ?? ""}
+            >
+              {manufactureProductOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          ) : room.roomType === "TRADING" ? (
+            <select
+              className={styles.posterProductSelect}
+              onChange={(e) => onRoomProductChange(room.roomNodeId, e.target.value as ProductKind)}
+              onPointerDown={(e) => e.stopPropagation()}
+              value={room.product ?? ""}
+            >
+              {tradingProductOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <span>{productLabel(room.product)}</span>
+          )}
+        </header>
+        <div className={styles.posterRoomQueueList}>
+          {document.queues.map((queue) => {
+            const assignment = queue.roomAssignments.find((item) => item.roomNodeId === room.roomNodeId);
+            if (!assignment) {
+              return null;
+            }
+
+            const slotRows =
+              room.roomType === "CONTROL"
+                ? [assignment.operators.slice(0, 3), assignment.operators.slice(3)]
+                : [assignment.operators];
+
+            return (
+              <div className={styles.posterRoomQueueRow} key={queue.id}>
+                <div className={styles.posterRoomQueueLabel}>
+                  <span>{queue.label}</span>
+                  <span>{assignment.effectiveEfficiencyLabel || assignment.paperEfficiencyLabel}</span>
+                </div>
+                {slotRows.map((rowSlots, rowIndex) => (
+                  <div className={styles.posterSlots} key={rowIndex}>
+                    {rowSlots.map((slot) => {
+                      const address = {
+                        queueId: queue.id,
+                        assignmentId: assignment.assignmentId,
+                        slotIndex: slot.slotIndex,
+                      };
+                      const operator = slot.operatorId ? operatorMap.get(slot.operatorId) : undefined;
+
+                      return (
+                        <PosterOperatorSlot
+                          address={address}
+                          key={slot.slotIndex}
+                          onSelect={onSlotSelect}
+                          operator={operator}
+                          product={assignment.product}
+                          reference={reference}
+                          roomType={room.roomType}
+                          selected={
+                            selectedSlot?.queueId === address.queueId &&
+                            selectedSlot.assignmentId === address.assignmentId &&
+                            selectedSlot.slotIndex === address.slotIndex
+                          }
+                          slot={slot}
+                        />
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   function renderCompactInfrastructureRoom(component: PosterComponent, room: BentoRoomNode) {
     const meta = [productLabel(room.product), `${room.slotCount} 人`].filter(Boolean).join(" · ");
     return (
@@ -575,10 +698,144 @@ export function PosterCanvas({
     );
   }
 
+  function renderSectionColumn(_component: PosterComponent, column: PosterColumnDef) {
+    return (
+      <div className={styles.posterFacilityGroupBody} style={{ gridTemplateRows: "minmax(0, 1fr)" }}>
+        <div
+          className={styles.posterSectionRows}
+          style={{ "--poster-lane-count": document.queues.length, "--poster-room-stack-size": column.roomNodeIds.length } as PosterStyle}
+        >
+          {document.queues.map((queue) => (
+            <div className={styles.posterSectionLane} key={queue.id}>
+              {column.roomNodeIds.map((roomNodeId) => {
+                const room = document.canvas.rooms.find((candidate) => candidate.roomNodeId === roomNodeId);
+                const assignment = queue.roomAssignments.find((item) => item.roomNodeId === roomNodeId);
+                if (!room || !assignment) {
+                  return null;
+                }
+
+                const slotRows =
+                  room.roomType === "CONTROL"
+                    ? [assignment.operators.slice(0, 3), assignment.operators.slice(3)]
+                    : [assignment.operators];
+
+                return (
+                  <article className={styles.posterRoomBlock} data-product={room.product} data-room-type={room.roomType} key={roomNodeId}>
+                    <div className={styles.posterRoomHeader}>
+                      <span>{room.label}</span>
+                      {room.roomType === "MANUFACTURE" ? (
+                        <select
+                          className={styles.posterProductSelect}
+                          onChange={(e) => onRoomProductChange(room.roomNodeId, e.target.value as ProductKind)}
+                          onPointerDown={(e) => e.stopPropagation()}
+                          value={room.product ?? ""}
+                        >
+                          {manufactureProductOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      ) : room.roomType === "TRADING" ? (
+                        <select
+                          className={styles.posterProductSelect}
+                          onChange={(e) => onRoomProductChange(room.roomNodeId, e.target.value as ProductKind)}
+                          onPointerDown={(e) => e.stopPropagation()}
+                          value={room.product ?? ""}
+                        >
+                          {tradingProductOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span>{productLabel(room.product)}</span>
+                      )}
+                    </div>
+                    <div className={styles.posterSlotRows}>
+                      {slotRows.map((rowSlots, rowIndex) => (
+                        <div className={styles.posterSlots} key={rowIndex}>
+                          {rowSlots.map((slot) => {
+                            const address = {
+                              queueId: queue.id,
+                              assignmentId: assignment.assignmentId,
+                              slotIndex: slot.slotIndex,
+                            };
+                            const operator = slot.operatorId ? operatorMap.get(slot.operatorId) : undefined;
+
+                            return (
+                              <PosterOperatorSlot
+                                address={address}
+                                key={slot.slotIndex}
+                                onSelect={onSlotSelect}
+                                operator={operator}
+                                product={assignment.product}
+                                reference={reference}
+                                roomType={room.roomType}
+                                selected={
+                                  selectedSlot?.queueId === address.queueId &&
+                                  selectedSlot.assignmentId === address.assignmentId &&
+                                  selectedSlot.slotIndex === address.slotIndex
+                                }
+                                slot={slot}
+                              />
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                    {(() => {
+                      const vert = room.roomType === "TRADING" || room.roomType === "MANUFACTURE" || room.roomType === "POWER";
+                      const sep = vert ? "\n" : "  ";
+                      const stored = assignment.paperEfficiencyLabel.trim();
+                      const display = stored || `${calculateRoomPaperEfficiency(assignment)}${sep}${calculateRoomEffectiveEfficiency(assignment)}`;
+
+                      return (
+                        <div className={styles.posterEfficiency}>
+                          <EditableText
+                            ariaLabel={`编辑 ${room.label} 效率`}
+                            className={styles.posterEfficiencyText}
+                            multiline
+                            onCommit={(text) => {
+                              if (!text.trim()) {
+                                onRoomEfficiencyLabelsChange(queue.id, assignment.assignmentId, {
+                                  paperEfficiencyLabel: "",
+                                  effectiveEfficiencyLabel: "",
+                                });
+                              } else {
+                                onRoomEfficiencyLabelsChange(queue.id, assignment.assignmentId, {
+                                  paperEfficiencyLabel: text,
+                                });
+                              }
+                            }}
+                            value={display}
+                          />
+                        </div>
+                      );
+                    })()}
+                  </article>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   function renderComponentBody(component: PosterComponent) {
     if (component.type === "infrastructure" && component.sectionId) {
+      const column = columnMap.get(component.sectionId);
+      if (column) {
+        return renderSectionColumn(component, column);
+      }
       const section = sectionMap.get(component.sectionId);
       return section ? renderInfrastructureSection(component, section) : null;
+    }
+
+    if (component.type === "infrastructure" && component.roomNodeId) {
+      return renderSingleRoom(component);
     }
 
     if (component.type === "infrastructure") {
@@ -592,13 +849,14 @@ export function PosterCanvas({
           <EditableText
             ariaLabel={`编辑${component.title}标题`}
             as="strong"
+            multiline
             onCommit={(title) => onPosterComponentContentChange(component.id, { title })}
             value={component.title}
           />
           <EditableText
             ariaLabel={`编辑${component.title}内容`}
             as="span"
-            multiline={component.type === "note"}
+            multiline
             onCommit={(text) => onPosterComponentContentChange(component.id, { text })}
             value={component.text ?? ""}
           />
@@ -691,12 +949,20 @@ export function PosterCanvas({
   function renderComponent(component: PosterComponent) {
     const infrastructureRoom =
       component.type === "infrastructure" ? roomForInfrastructureComponent(component) : undefined;
-    const section = component.sectionId
-      ? sectionMap.get(component.sectionId)
-      : infrastructureRoom
-        ? sectionForRoom(infrastructureRoom)
-        : component.roomType
-        ? view.sections.find((item) => item.blocks.some((block) => block.roomType === component.roomType))
+    const column = component.sectionId ? columnMap.get(component.sectionId) : undefined;
+    const vsection = column
+      ? undefined
+      : component.sectionId
+        ? sectionMap.get(component.sectionId)
+        : infrastructureRoom
+          ? sectionForRoom(infrastructureRoom)
+          : component.roomType
+            ? view.sections.find((item) => item.blocks.some((block) => block.roomType === component.roomType))
+            : undefined;
+    const themeClass = column
+      ? columnThemeStyles[columnThemeMap[column.id] ?? "other"]
+      : vsection
+        ? sectionTheme[vsection.kind]
         : undefined;
     const selected = selectedPosterComponentId === component.id;
     const activeRect = draftRects[component.id] ?? component.rect;
@@ -718,7 +984,7 @@ export function PosterCanvas({
     return (
       <ContextMenu.Root key={component.id}>
         <ContextMenu.Trigger
-          className={componentClasses(component, section)}
+          className={componentClasses(component, themeClass)}
           data-poster-component
           data-poster-component-id={component.id}
           data-poster-component-selected={selected}

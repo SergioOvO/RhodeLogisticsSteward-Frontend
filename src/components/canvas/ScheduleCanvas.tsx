@@ -26,6 +26,7 @@ interface ScheduleCanvasProps {
   onRoomResize: (roomNodeId: string, rect: GridRect) => void;
   onRoomProductChange: (roomNodeId: string, product?: ProductKind) => void;
   onRoomRemove: (roomNodeId: string) => void;
+  onRoomEfficiencyLabelsChange: (queueId: string, assignmentId: string, labels: { paperEfficiencyLabel?: string; effectiveEfficiencyLabel?: string }) => void;
   onPosterComponentRectChange: (componentId: string, rect: PosterRect) => void;
   onPosterComponentContentChange?: (componentId: string, patch: PosterComponentContentPatch) => void;
   onPosterComponentSelect?: (componentId: string | null) => void;
@@ -49,6 +50,7 @@ export const ScheduleCanvas = forwardRef<HTMLDivElement, ScheduleCanvasProps>(
       onRoomResize,
       onRoomProductChange,
       onRoomRemove,
+      onRoomEfficiencyLabelsChange,
       onPosterComponentRectChange,
       onPosterComponentContentChange = () => undefined,
       onPosterComponentDelete = () => undefined,
@@ -84,6 +86,7 @@ export const ScheduleCanvas = forwardRef<HTMLDivElement, ScheduleCanvasProps>(
             onRoomProductChange={onRoomProductChange}
             onRoomRemove={onRoomRemove}
             onRoomResize={onRoomResize}
+            onRoomEfficiencyLabelsChange={onRoomEfficiencyLabelsChange}
             onPosterComponentRectChange={onPosterComponentRectChange}
             onPosterComponentContentChange={onPosterComponentContentChange}
             onPosterComponentDelete={onPosterComponentDelete}

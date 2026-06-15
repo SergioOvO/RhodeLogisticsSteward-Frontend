@@ -74,9 +74,8 @@
 
 .fieldLabel {
   color: var(--color-muted);
-  font-size: 10px;
-  font-weight: 900;
-  line-height: 1;
+  font-size: 14px;
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -91,7 +90,7 @@
   color: var(--color-ink);
   background: var(--color-panel-strong);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.74);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
 }
 
@@ -619,8 +618,8 @@
 }
 
 .canvasScale {
-  width: 960px;
-  height: 540px;
+  width: 1200px;
+  height: 675px;
   transform-origin: top left;
 }
 

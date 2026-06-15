@@ -11,6 +11,7 @@ import {
   clampPosterComponentRect,
   clampPosterRect,
   DEFAULT_POSTER_COMPONENT_RECTS,
+  DEFAULT_ROOM_RECT,
   normalizePosterCanvas,
   validatePosterCanvas,
 } from "./posterCanvas";
@@ -479,20 +480,6 @@ export function addPosterComponent(
   });
 }
 
-function sectionForRoom(document: ScheduleDocument, room: BentoRoomNode) {
-  return buildPosterViewModel(document).sections.find((section) =>
-    section.blocks.some((block) => block.roomNodeId === room.roomNodeId),
-  );
-}
-
-function defaultSectionRect(document: ScheduleDocument, sectionId: string): PosterRect {
-  const defaultComponent = buildDefaultPosterCanvas(document).components.find(
-    (component) => component.type === "infrastructure" && component.sectionId === sectionId,
-  );
-
-  return defaultComponent?.rect ?? { x: 600, y: 760, w: 2600, h: 1100 };
-}
-
 export function addInfrastructureComponent(
   document: ScheduleDocument,
   roomType: BentoRoomTypeId,
@@ -501,11 +488,6 @@ export function addInfrastructureComponent(
   const documentWithRoom = document.canvas.rooms.some((room) => room.roomType === roomType)
     ? document
     : addRoom(document, roomType);
-  const hasSourceRoom = documentWithRoom.canvas.rooms.some((room) => room.roomType === roomType);
-
-  if (!hasSourceRoom) {
-    return document;
-  }
 
   const posterCanvas = currentPosterCanvas(documentWithRoom);
   const sourceRoom = nextInfrastructureRoom(documentWithRoom, roomType, posterCanvas.components);
@@ -513,19 +495,13 @@ export function addInfrastructureComponent(
     return document;
   }
 
-  const section = sectionForRoom(documentWithRoom, sourceRoom);
-  if (!section) {
-    return document;
-  }
-
   const zIndex = nextPosterZIndex(posterCanvas.components);
   const component: PosterComponent = {
-    id: nextPosterComponentId(posterCanvas.components, "infrastructure", `manual:${section.id}`),
+    id: nextPosterComponentId(posterCanvas.components, "infrastructure", `room:${sourceRoom.roomNodeId}`),
     type: "infrastructure",
-    title: section.title,
-    sectionId: section.id,
-    roomType: sourceRoom.roomType,
-    rect: posterRectFromCenter("infrastructure", defaultSectionRect(documentWithRoom, section.id), center),
+    title: sourceRoom.label,
+    roomNodeId: sourceRoom.roomNodeId,
+    rect: posterRectFromCenter("infrastructure", DEFAULT_ROOM_RECT, center),
     zIndex,
   };
 
@@ -765,7 +741,7 @@ export function setRoomProduct(
 
   const nextProduct: ProductKind | undefined =
     room.roomType === "TRADING"
-      ? "Money"
+      ? product ?? "Money"
       : room.roomType === "MANUFACTURE"
         ? product ?? "PureGold"
         : undefined;
@@ -802,7 +778,7 @@ export function assignOperator(
     ...assignment,
     operators: assignment.operators.map((slot) =>
       slot.slotIndex === slotIndex
-        ? applySlotPayload(slot, { operatorId, overrideName: undefined, elitePhase: undefined })
+        ? applySlotPayload(slot, { operatorId })
         : slot,
     ),
   }));

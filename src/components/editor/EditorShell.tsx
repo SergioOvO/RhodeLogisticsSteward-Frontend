@@ -27,8 +27,8 @@ interface EditorShellProps {
   initialDocument?: ScheduleDocument;
 }
 
-const CANVAS_WIDTH = 960;
-const CANVAS_HEIGHT = 540;
+const CANVAS_WIDTH = 1200;
+const CANVAS_HEIGHT = 675;
 const MIN_ZOOM = 0.54;
 const MAX_ZOOM = 2.4;
 const ZOOM_STEP = 0.08;
@@ -407,7 +407,18 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
             />
           </header>
         ) : null}
-        <main className={styles.workspace} data-sidebar-collapsed={sidebarCollapsed || focusMode}>
+        <main
+          className={styles.workspace}
+          data-sidebar-collapsed={sidebarCollapsed || focusMode}
+          onClick={(event) => {
+            const target = event.target as Element;
+            if (target.closest("[data-poster-slot], [data-bento-slot], [data-portrait-slot]")) {
+              return;
+            }
+            setSelectedSlot(null);
+            setPickerOpen(false);
+          }}
+        >
           {!focusMode && !sidebarCollapsed ? (
             <BuildingPalette
               document={store.document}
@@ -478,6 +489,7 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
                     onRoomProductChange={store.setRoomProduct}
                     onRoomRemove={store.removeRoom}
                     onRoomResize={store.resizeRoom}
+                    onRoomEfficiencyLabelsChange={store.updateRoomEfficiencyLabels}
                     onSlotSelect={(address) => {
                       setSelectedSlot(address);
                       setPickerOpen(true);
@@ -514,7 +526,10 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
               );
             }
           }}
-          onOpenChange={setPickerOpen}
+          onOpenChange={(open) => {
+            setPickerOpen(open);
+            if (!open) setSelectedSlot(null);
+          }}
           open={pickerOpen}
           operators={operators}
           reference={reference}

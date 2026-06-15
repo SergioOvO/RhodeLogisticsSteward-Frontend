@@ -26,6 +26,7 @@
   min-width: 0;
   cursor: text;
   border-radius: 3px;
+  background-color: transparent
 }
 
 .editableText:hover {
@@ -1271,6 +1272,70 @@
   overflow: hidden;
 }
 
+.posterSingleRoom {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  padding: 4px 6px;
+}
+
+.posterSingleRoom[data-product="PureGold"] {
+  background: rgba(255, 240, 189, 0.45);
+}
+
+.posterSingleRoom[data-product="CombatRecord"] {
+  background: #ffede0;
+}
+
+.posterSingleRoom .posterRoomHeader {
+  display: flex;
+  min-width: 0;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(40, 50, 44, 0.22);
+}
+
+.posterRoomName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.posterRoomQueueList {
+  display: grid;
+  min-height: 0;
+  gap: 2px;
+  align-content: start;
+}
+
+.posterRoomQueueRow {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 2px;
+  padding: 3px 0;
+}
+
+.posterRoomQueueLabel {
+  display: flex;
+  min-width: 0;
+  justify-content: space-between;
+  gap: 4px;
+  color: rgba(31, 38, 35, 0.72);
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.posterRoomQueueLabel span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .posterSingleFacility {
   display: grid;
   min-height: 0;
@@ -1336,31 +1401,27 @@
   display: grid;
   min-width: 0;
   min-height: 0;
-  align-content: center;
+  align-content: start;
   gap: 4px;
-  padding: 6px 8px;
+  padding: 2px 4px;
   color: #17201b;
 }
 
 .posterTextComponent strong,
 .posterLaneComponent strong {
   overflow: hidden;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 900;
-  line-height: 1;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .posterTextComponent span,
 .posterLaneComponent small {
   overflow: hidden;
   color: rgba(31, 38, 35, 0.76);
-  font-size: 8px;
-  font-weight: 800;
-  line-height: 1.15;
+  font-size: 10px;
+  font-weight: 600;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .posterLaneComponent {
@@ -1593,22 +1654,75 @@
   display: grid;
   min-width: 0;
   min-height: 0;
-  grid-template-rows: auto minmax(0, auto) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 1px;
   padding: 2px;
   background: rgba(255, 253, 244, 0.38);
   overflow: hidden;
 }
 
+.posterRoomBlock[data-product="PureGold"] {
+  background: #fff1c7;
+}
+
+.posterRoomBlock[data-product="CombatRecord"] {
+  background: #ffede0;
+}
+
+.posterRoomBlock[data-product="OriginStone"] {
+  background: #ffd6b2;
+}
+
+.posterRoomBlock[data-room-type="TRADING"],
+.posterRoomBlock[data-room-type="MANUFACTURE"] {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 35%);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+.posterRoomBlock[data-room-type="POWER"] {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 50%);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.posterRoomBlock[data-room-type="TRADING"] .posterRoomHeader,
+.posterRoomBlock[data-room-type="MANUFACTURE"] .posterRoomHeader,
+.posterRoomBlock[data-room-type="POWER"] .posterRoomHeader {
+  grid-column: 1 / -1;
+}
+
+.posterRoomBlock[data-room-type="TRADING"] .posterEfficiency,
+.posterRoomBlock[data-room-type="MANUFACTURE"] .posterEfficiency,
+.posterRoomBlock[data-room-type="POWER"] .posterEfficiency {
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 4px;
+  min-width: 0;
+}
+
+.posterProductSelect {
+  width: 50px;
+  height: 15px;
+  border: 1px solid rgba(40, 50, 44, 0.18);
+  border-radius: 3px;
+  padding: 1px 2px;
+  color: rgba(31, 38, 35, 0.72);
+  background: rgba(255, 253, 244, 0.64);
+  cursor: pointer;
+  font-size: 8px;
+  font-weight: 600;
+  outline: none;
+  appearance: none;
+  text-align: center;
+}
+
 .posterRoomHeader {
   display: flex;
   min-width: 0;
   justify-content: space-between;
+  align-items: center;
   gap: 3px;
   color: #26302b;
-  font-size: 7px;
-  font-weight: 900;
-  line-height: 1;
+  font-size: 8px;
+  font-weight: 600;
 }
 
 .posterRoomHeader span {
@@ -1619,16 +1733,22 @@
 
 .posterRoomHeader span:last-child {
   color: rgba(31, 38, 35, 0.62);
-  font-size: 6px;
+  font-size: 8px;
+}
+
+.posterSlotRows {
+  display: grid;
+  grid-auto-rows: 1fr;
+  min-height: 0;
 }
 
 .posterSlots {
   display: flex;
   min-width: 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 3px;
   align-items: center;
-  justify-content: center;
+  justify-content: space-evenly;
 }
 
 .posterSlot {
@@ -1638,12 +1758,10 @@
   height: calc(var(--poster-operator-size) + var(--poster-name-height));
   grid-template-rows: var(--poster-operator-size) var(--poster-name-height);
   border: 1px solid transparent;
-  border-radius: 4px;
   padding: 0;
   color: #17201b;
   background: transparent;
   cursor: pointer;
-  overflow: hidden;
 }
 
 .posterSlot:hover,
@@ -1689,13 +1807,11 @@
   align-items: center;
   justify-items: center;
   color: #17201b;
-  font-size: 5px;
-  font-weight: 900;
-  line-height: 1;
+  font-size: 8px;
+  font-weight: 600;
 }
 
 .posterSlotName span {
-  overflow: hidden;
   max-width: 100%;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1712,9 +1828,41 @@
   justify-content: center;
   gap: 1px 5px;
   color: rgba(31, 38, 35, 0.72);
-  font-size: 6px;
-  font-weight: 900;
-  line-height: 1.05;
+  font-size: 8px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.posterEfficiency .posterEfficiencyText {
+  max-width: 100%;
+  min-width: 24px;
+  min-height: 1em;
+  flex-shrink: 1;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  pointer-events: auto;
+  text-align: center;
+  border-radius: 2px;
+  padding: 1px 3px;
+  background: transparent;
+}
+
+.posterEfficiencyText:hover {
+  background: rgba(255, 253, 244, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(30, 107, 88, 0.18);
+}
+
+.posterEfficiencyText:focus {
+  background: rgba(255, 253, 244, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(30, 107, 88, 0.5);
+  outline: none;
+}
+
+.posterEfficiencyText:empty::before {
+  content: "点击编辑";
+  color: rgba(31, 38, 35, 0.22);
+  font-style: italic;
   pointer-events: none;
 }
 
@@ -1746,7 +1894,7 @@
 }
 
 .posterThemeTrade {
-  background: #dbeaff;
+  background: #d9e3f3;
 }
 
 .posterThemeGold {
@@ -1759,6 +1907,10 @@
 
 .posterThemeJade {
   background: #f6c17d;
+}
+
+.posterThemeManufacture {
+  background: #eee5d4;
 }
 
 .posterThemePower {

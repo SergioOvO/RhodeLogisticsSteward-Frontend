@@ -1,7 +1,6 @@
 import {
   buildPosterViewModel,
   type ConcretePosterTemplateId,
-  type PosterSection,
 } from "./posterViewModel";
 import { bentoRoomDefinitions } from "./bentoDefinitions";
 import type {
@@ -18,12 +17,13 @@ export const MIN_POSTER_COMPONENT_SIZE = 400;
 const MIN_POSTER_DIVIDER_HEIGHT = 120;
 const POSTER_MARGIN = 220;
 const POSTER_DIVIDER_TOP = 1080;
-const POSTER_SECTION_TOP = 980;
+const POSTER_SECTION_START_Y = 980;
+const POSTER_SECTION_BOTTOM = POSTER_COORD_MAX - POSTER_MARGIN;
 
 export const DEFAULT_POSTER_COMPONENT_RECTS = {
-  title: { x: POSTER_MARGIN, y: 180, w: 2700, h: 640 },
-  production: { x: 3060, y: 180, w: 4360, h: 640 },
-  drone: { x: 7580, y: 180, w: 2200, h: 640 },
+  title: { x: POSTER_MARGIN, y: 180, w: 2700, h: 780 },
+  production: { x: 3060, y: 180, w: 4360, h: 780 },
+  drone: { x: 7580, y: 180, w: 2200, h: 780 },
   note: { x: 3060, y: 640, w: 4360, h: 400 },
   divider: {
     x: POSTER_MARGIN,
@@ -32,6 +32,130 @@ export const DEFAULT_POSTER_COMPONENT_RECTS = {
     h: MIN_POSTER_DIVIDER_HEIGHT,
   },
 } as const satisfies Record<string, PosterRect>;
+
+export const DEFAULT_ROOM_RECT: PosterRect = {
+  x: POSTER_MARGIN,
+  y: POSTER_SECTION_START_Y,
+  w: 1440,
+  h: 880,
+};
+
+export interface PosterColumnDef {
+  id: string;
+  title: string;
+  roomNodeIds: string[];
+  widthFraction?: number;
+}
+
+export function getPosterColumns(layoutId: string): PosterColumnDef[] {
+  switch (layoutId) {
+    case "153":
+      return [
+        { id: "control", title: "中枢", roomNodeIds: ["control-1"] },
+        { id: "trade", title: "贸易", roomNodeIds: ["trading-1"] },
+        { id: "mfg-a", title: "制造①", roomNodeIds: ["manufacture-1", "manufacture-2", "manufacture-3"] },
+        { id: "mfg-b", title: "制造②", roomNodeIds: ["manufacture-4", "manufacture-5"] },
+        { id: "power", title: "发电", roomNodeIds: ["power-1", "power-2", "power-3"], widthFraction: 0.12 },
+        { id: "other", title: "其他", roomNodeIds: ["meeting-1", "hire-1"], widthFraction: 0.12 },
+      ];
+    case "252":
+      return [
+        { id: "control", title: "中枢", roomNodeIds: ["control-1"] },
+        { id: "trade", title: "贸易", roomNodeIds: ["trading-1", "trading-2"] },
+        { id: "mfg-a", title: "制造①", roomNodeIds: ["manufacture-1", "manufacture-2", "manufacture-3"] },
+        { id: "mfg-b", title: "制造②", roomNodeIds: ["manufacture-4", "manufacture-5"] },
+        { id: "power", title: "发电", roomNodeIds: ["power-1", "power-2"], widthFraction: 0.12 },
+        { id: "other", title: "其他", roomNodeIds: ["meeting-1", "hire-1"], widthFraction: 0.12 },
+      ];
+    case "333":
+      return [
+        { id: "control", title: "中枢", roomNodeIds: ["control-1"] },
+        { id: "trade", title: "贸易", roomNodeIds: ["trading-1", "trading-2", "trading-3"] },
+        { id: "gold", title: "赤金", roomNodeIds: ["manufacture-1"] },
+        { id: "record", title: "经验", roomNodeIds: ["manufacture-2", "manufacture-3"] },
+        { id: "power", title: "发电", roomNodeIds: ["power-1", "power-2", "power-3"], widthFraction: 0.12 },
+        { id: "other", title: "其他", roomNodeIds: ["meeting-1", "hire-1"], widthFraction: 0.12 },
+      ];
+    case "342":
+      return [
+        { id: "control", title: "中枢", roomNodeIds: ["control-1"] },
+        { id: "trade", title: "贸易", roomNodeIds: ["trading-1", "trading-2", "trading-3"] },
+        { id: "gold", title: "赤金", roomNodeIds: ["manufacture-1", "manufacture-2"] },
+        { id: "record", title: "经验", roomNodeIds: ["manufacture-3", "manufacture-4"] },
+        { id: "power", title: "发电", roomNodeIds: ["power-1", "power-2"], widthFraction: 0.12 },
+        { id: "other", title: "其他", roomNodeIds: ["meeting-1", "hire-1"], widthFraction: 0.12 },
+      ];
+    case "243":
+    default:
+      return [
+        { id: "control", title: "中枢", roomNodeIds: ["control-1"] },
+        { id: "trade", title: "贸易", roomNodeIds: ["trading-1", "trading-2"] },
+        { id: "gold", title: "赤金", roomNodeIds: ["manufacture-1", "manufacture-2"] },
+        { id: "record", title: "经验", roomNodeIds: ["manufacture-3", "manufacture-4"] },
+        { id: "power", title: "发电", roomNodeIds: ["power-1", "power-2", "power-3"], widthFraction: 0.12 },
+        { id: "other", title: "其他", roomNodeIds: ["meeting-1", "hire-1"], widthFraction: 0.12 },
+      ];
+  }
+}
+
+type ColumnTheme = "control" | "trade" | "gold" | "record" | "power" | "manufacture" | "other";
+
+export const columnThemeMap: Record<string, ColumnTheme> = {
+  control: "control",
+  trade: "trade",
+  gold: "manufacture",
+  record: "manufacture",
+  "mfg-a": "manufacture",
+  "mfg-b": "manufacture",
+  power: "power",
+  other: "other",
+};
+
+function columnRects(columns: PosterColumnDef[], document: ScheduleDocument): PosterRect[] {
+  if (columns.length === 0) {
+    return [];
+  }
+
+  const availableWidth = POSTER_COORD_MAX - POSTER_MARGIN * 2;
+  const sectionHeight = POSTER_SECTION_BOTTOM - POSTER_SECTION_START_Y;
+  const roomMap = new Map(document.canvas.rooms.map((room) => [room.roomNodeId, room]));
+
+  const fixedFraction = columns.reduce((sum, col) => sum + (col.widthFraction ?? 0), 0);
+  const remainingFraction = Math.max(0, 1 - fixedFraction);
+  const remainingWidth = availableWidth * remainingFraction;
+
+  const weights = columns.map((col) => {
+    if (col.widthFraction !== undefined) return 0;
+    return col.roomNodeIds.reduce((maxSlots, roomNodeId) => {
+      const room = roomMap.get(roomNodeId);
+      const slots = room?.roomType === "CONTROL" ? 3 : (room?.slotCount ?? 1);
+      return Math.max(maxSlots, slots);
+    }, 0);
+  });
+  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+
+  const widths = columns.map((col, i) => {
+    if (col.widthFraction !== undefined) {
+      return Math.floor(availableWidth * col.widthFraction);
+    }
+    if (totalWeight === 0) return MIN_POSTER_COMPONENT_SIZE;
+    return Math.max(MIN_POSTER_COMPONENT_SIZE, Math.floor((remainingWidth * weights[i]) / totalWeight));
+  });
+
+  const rects: PosterRect[] = [];
+  let x = POSTER_MARGIN;
+
+  for (let i = 0; i < columns.length; i++) {
+    const isLast = i === columns.length - 1;
+    const w = isLast
+      ? POSTER_COORD_MAX - POSTER_MARGIN - x
+      : widths[i];
+    rects.push({ x, y: POSTER_SECTION_START_Y, w, h: sectionHeight });
+    x += w;
+  }
+
+  return rects;
+}
 
 const componentTypes = [
   "infrastructure",
@@ -59,59 +183,10 @@ function textValue(value: unknown): string | undefined {
   return typeof value === "string" && value.length > 0 ? value : undefined;
 }
 
-function sectionTitle(section: PosterSection): string {
-  return section.product ? `${section.title}` : section.title;
-}
-
 function productionLine(document: ScheduleDocument): string {
   return [document.productionSummary.orderText, document.productionSummary.goldText, document.productionSummary.recordText]
     .filter(Boolean)
     .join(" · ");
-}
-
-function sectionWeight(section: PosterSection): number {
-  if (section.kind === "control") {
-    return 1.28;
-  }
-  if (
-    section.kind === "trade" ||
-    section.kind === "gold" ||
-    section.kind === "record" ||
-    section.kind === "jadeManufacture"
-  ) {
-    return 1.18;
-  }
-  if (section.kind === "power") {
-    return 0.82;
-  }
-  return 0.94;
-}
-
-function strictSectionRects(sections: PosterSection[]): PosterRect[] {
-  const availableWidth = POSTER_COORD_MAX - POSTER_MARGIN * 2;
-  const weights = sections.map(sectionWeight);
-  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-  let x = POSTER_MARGIN;
-
-  return sections.map((_, index) => {
-    const width =
-      index === sections.length - 1
-        ? POSTER_COORD_MAX - POSTER_MARGIN - x
-        : Math.max(MIN_POSTER_COMPONENT_SIZE, Math.floor((availableWidth * weights[index]) / totalWeight));
-    const rect = {
-      x,
-      y: POSTER_SECTION_TOP,
-      w: width,
-      h: POSTER_COORD_MAX - POSTER_MARGIN - POSTER_SECTION_TOP,
-    };
-
-    x += width;
-    return rect;
-  });
-}
-
-function componentId(value: string): string {
-  return value.replace(/[^a-zA-Z0-9:._-]/g, "-");
 }
 
 export function clampPosterRect(rect: PosterRect): PosterRect {
@@ -146,7 +221,6 @@ export function clampPosterComponentRect(type: PosterComponentType, rect: Poster
 export function buildDefaultPosterCanvas(document: ScheduleDocument): PosterCanvasState {
   const view = buildPosterViewModel(document);
   const components: PosterComponent[] = [];
-  const sectionRects = strictSectionRects(view.sections);
 
   components.push(
     {
@@ -178,13 +252,16 @@ export function buildDefaultPosterCanvas(document: ScheduleDocument): PosterCanv
     },
   );
 
-  view.sections.forEach((section, index) => {
+  const columns = getPosterColumns(document.layoutId);
+  const rects = columnRects(columns, document);
+
+  columns.forEach((col, index) => {
     components.push({
-      id: componentId(`section:${section.id}`),
+      id: `section:${col.id}`,
       type: "infrastructure",
-      title: sectionTitle(section),
-      sectionId: section.id,
-      rect: sectionRects[index],
+      title: col.title,
+      sectionId: col.id,
+      rect: rects[index],
       zIndex: 20 + index,
     });
   });
