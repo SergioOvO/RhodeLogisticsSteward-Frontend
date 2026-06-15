@@ -49,7 +49,7 @@ interface PosterCanvasProps {
   onRoomResize: (roomNodeId: string, rect: GridRect) => void;
   onRoomProductChange: (roomNodeId: string, product?: ProductKind) => void;
   onRoomRemove: (roomNodeId: string) => void;
-  onRoomEfficiencyLabelsChange: (queueId: string, assignmentId: string, labels: { paperEfficiencyLabel?: string; effectiveEfficiencyLabel?: string }) => void;
+  onRoomEfficiencyLabelsChange?: (queueId: string, assignmentId: string, labels: { paperEfficiencyLabel?: string; effectiveEfficiencyLabel?: string }) => void;
   onPosterComponentRectChange: (componentId: string, rect: PosterRect) => void;
   onPosterComponentContentChange: (componentId: string, patch: PosterComponentContentPatch) => void;
   onPosterComponentDelete: (componentId: string) => void;
@@ -799,12 +799,12 @@ export function PosterCanvas({
                             multiline
                             onCommit={(text) => {
                               if (!text.trim()) {
-                                onRoomEfficiencyLabelsChange(queue.id, assignment.assignmentId, {
+                                onRoomEfficiencyLabelsChange?.(queue.id, assignment.assignmentId, {
                                   paperEfficiencyLabel: "",
                                   effectiveEfficiencyLabel: "",
                                 });
                               } else {
-                                onRoomEfficiencyLabelsChange(queue.id, assignment.assignmentId, {
+                                onRoomEfficiencyLabelsChange?.(queue.id, assignment.assignmentId, {
                                   paperEfficiencyLabel: text,
                                 });
                               }
