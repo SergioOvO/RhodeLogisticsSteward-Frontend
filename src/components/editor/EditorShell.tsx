@@ -78,12 +78,45 @@ async function loadJson<T>(path: string): Promise<T> {
   return (await response.json()) as T;
 }
 
+function assertLoadedEditorData(
+  manifest: OperatorManifest,
+  buildingReference: BuildingReference,
+): void {
+  if (!Array.isArray(manifest.operators) || manifest.operators.length === 0) {
+    throw new Error("Operator manifest is empty. Backend data was not loaded.");
+  }
+
+  if (!Array.isArray(buildingReference.roomTypes) || buildingReference.roomTypes.length === 0) {
+    throw new Error("Building reference room types are empty. Backend data was not loaded.");
+  }
+
+  if (
+    !Array.isArray(buildingReference.productionFormulaTypes) ||
+    buildingReference.productionFormulaTypes.length === 0
+  ) {
+    throw new Error("Building reference formula types are empty. Backend data was not loaded.");
+  }
+
+  if (!Array.isArray(buildingReference.operatorSkills) || buildingReference.operatorSkills.length === 0) {
+    throw new Error("Building reference operator skills are empty. Backend data was not loaded.");
+  }
+
+  if (
+    !buildingReference.skillsById ||
+    typeof buildingReference.skillsById !== "object" ||
+    Object.keys(buildingReference.skillsById).length === 0
+  ) {
+    throw new Error("Building reference skills are empty. Backend data was not loaded.");
+  }
+}
+
 export function EditorShell({ initialDocument }: EditorShellProps) {
   const store = useScheduleStore(initialDocument);
-  const [operators, setOperators] = useState<Operator[]>([]);
+  const [operators, setOperators] = useState<Operator[] | null>(null);
   const [reference, setReference] = useState<BuildingReference | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<SlotAddress | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [loadError, setLoadError] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [fitZoom, setFitZoom] = useState(1);
@@ -129,11 +162,23 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
         if (!active) {
           return;
         }
+        assertLoadedEditorData(manifest, buildingReference);
         setOperators(manifest.operators);
         setReference(buildingReference);
+        setLoadError("");
       })
       .catch((loadError: unknown) => {
-        setError(loadError instanceof Error ? loadError.message : "静态数据加载失败。");
+        if (!active) {
+          return;
+        }
+
+        setOperators(null);
+        setReference(null);
+        setLoadError(
+          loadError instanceof Error
+            ? `Backend data load failed: ${loadError.message}`
+            : "Backend data load failed.",
+        );
       });
 
     return () => {
@@ -193,6 +238,11 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
 
   async function handleImport(file: File | undefined) {
     if (!file) {
+      return;
+    }
+    if (operators === null) {
+      setError("Cannot import before backend data is loaded.");
+      setNotice("");
       return;
     }
 
@@ -366,6 +416,24 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
             {renderZoomActions()}
           </div>
         ) : null}
+      </div>
+    );
+  }
+
+  if (loadError || operators === null || reference === null) {
+    return (
+      <div className={styles.appFrame} data-focus-mode={false} data-sidebar-collapsed>
+        <main className={styles.workspace} data-sidebar-collapsed>
+          <section className={styles.canvasStage}>
+            {loadError ? (
+              <div className={styles.error} role="alert">
+                {loadError}
+              </div>
+            ) : (
+              <div className={styles.notice}>Loading backend data...</div>
+            )}
+          </section>
+        </main>
       </div>
     );
   }

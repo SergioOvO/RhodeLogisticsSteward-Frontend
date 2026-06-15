@@ -17,29 +17,86 @@ const emptyReference = {
   skillsById: {},
 };
 
+const operatorManifest = {
+  source: {
+    localSourcePath: "",
+    metadataRows: 1,
+    portraitFiles: 1,
+    professionIconFiles: 0,
+    rarityIconFiles: 0,
+    eliteIconFiles: 0,
+    warnings: [],
+  },
+  operators: [
+    {
+      id: "op-amiya",
+      name: "Amiya",
+      portraitPath: "",
+      aliases: ["阿米娅"],
+      tags: [],
+      source: "mock",
+    },
+  ],
+};
+
+const buildingReference = {
+  source: {
+    localSourcePath: "",
+    upstreamRepository: "",
+    upstreamCommit: "",
+    generatedAt: "",
+    rowCounts: {},
+  },
+  roomTypes: [
+    {
+      id: "MANUFACTURE",
+      label: "Manufacture",
+      operatorCount: 1,
+      skillRowCount: 1,
+    },
+  ],
+  productionFormulaTypes: [
+    {
+      id: "F_EXP",
+      label: "Battle Record",
+      sources: ["manufacturing"],
+      buffTypeIds: ["skill-a"],
+      itemNames: ["Battle Record"],
+      skillTargetCount: 1,
+    },
+  ],
+  operatorSkills: [
+    {
+      operatorId: "op-amiya",
+      operatorName: "Amiya",
+      roomType: "MANUFACTURE",
+      buffId: "skill-a",
+      buffName: "Manufacture",
+      descriptionText: "",
+      targetFormulaTypes: ["F_EXP"],
+      conditionPhase: "PHASE_0",
+      conditionLevel: 1,
+    },
+  ],
+  skillsById: {
+    "skill-a": {
+      buffId: "skill-a",
+      buffName: "Manufacture",
+      roomType: "MANUFACTURE",
+      descriptionText: "",
+      efficiency: 0,
+      targetFormulaTypes: ["F_EXP"],
+    },
+  },
+};
+
 function mockStaticData() {
   vi.stubGlobal(
     "fetch",
     vi.fn((path: string) =>
       Promise.resolve({
         ok: true,
-        json: () =>
-          Promise.resolve(
-            path.includes("operators")
-              ? {
-                  source: {
-                    localSourcePath: "",
-                    metadataRows: 0,
-                    portraitFiles: 0,
-                    professionIconFiles: 0,
-                    rarityIconFiles: 0,
-                    eliteIconFiles: 0,
-                    warnings: [],
-                  },
-                  operators: [],
-                }
-              : emptyReference,
-          ),
+        json: () => Promise.resolve(path.includes("operators") ? operatorManifest : buildingReference),
       }),
     ),
   );
@@ -154,5 +211,38 @@ describe("EditorShell layout space controls", () => {
     fireEvent.click(snapToggle);
 
     expect(snapToggle).toHaveAttribute("data-unchecked");
+  });
+
+  it("shows a fatal load error instead of rendering the editor with empty backend data", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((path: string) =>
+        Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve(
+              path.includes("operators")
+                ? {
+                    source: {
+                      localSourcePath: "",
+                      metadataRows: 0,
+                      portraitFiles: 0,
+                      professionIconFiles: 0,
+                      rarityIconFiles: 0,
+                      eliteIconFiles: 0,
+                      warnings: [],
+                    },
+                    operators: [],
+                  }
+                : emptyReference,
+            ),
+        }),
+      ),
+    );
+
+    const { container } = render(<EditorShell initialDocument={createDefaultSchedule("243", 3)} />);
+
+    await waitFor(() => expect(screen.getByText(/operator manifest/i)).toBeInTheDocument());
+    expect(container.querySelector("[data-canvas-root]")).not.toBeInTheDocument();
   });
 });
