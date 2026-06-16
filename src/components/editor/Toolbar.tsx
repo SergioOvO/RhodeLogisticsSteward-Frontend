@@ -18,7 +18,8 @@ import {
 } from "../../domain/posterDefinitions";
 import { queueCountOptions } from "../../domain/queueLimits";
 import type { PosterMode, PosterTemplateId, ScheduleDocument } from "../../domain/types";
-import styles from "../../styles/editor.module.css";
+import shared from "../../styles/shared.module.css";
+import styles from "../../styles/Toolbar.module.css";
 import { ContourButton } from "../ui/ContourButton";
 
 interface ToolbarProps {
@@ -43,10 +44,10 @@ function LayoutSelect({
   const items = bentoLayoutIds.map((layoutId) => ({ label: layoutId, value: layoutId }));
 
   return (
-    <label className={styles.field}>
-      <span className={styles.fieldLabel}>布局</span>
+    <label className={shared.field}>
+      <span className={shared.fieldLabel}>布局</span>
       <Select.Root items={items} onValueChange={(next) => onChange(String(next))} value={value}>
-        <Select.Trigger className={styles.selectTrigger}>
+        <Select.Trigger className={shared.selectTrigger}>
           <Select.Value />
           <Select.Icon className={styles.selectIcon}>
             <CaretDownIcon size={14} />
@@ -88,11 +89,11 @@ function NativeSelect({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className={styles.field}>
-      <span className={styles.fieldLabel}>{label}</span>
+    <label className={shared.field}>
+      <span className={shared.fieldLabel}>{label}</span>
       <select
         aria-label={label}
-        className={styles.textInput}
+        className={shared.textInput}
         onChange={(event) => onChange(event.target.value)}
         value={value}
       >

@@ -1,0 +1,187 @@
+.dialogBackdrop {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  background: rgba(31, 38, 35, 0.42);
+}
+
+.dialogPopup {
+  position: fixed;
+  z-index: 61;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: min(920px, calc(100vw - 28px));
+  max-height: min(760px, calc(80vh - 28px));
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: 12px;
+  overflow: hidden;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  background: var(--color-panel);
+  box-shadow: 0 28px 72px rgba(31, 38, 35, 0.32);
+  transform: translate(-50%, -50%);
+}
+
+.dialogTitle {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.dialogControls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.dialogFilterBar {
+  display: grid;
+  max-height: 210px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.dialogActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.filterGroup {
+  display: grid;
+  gap: 8px;
+}
+
+.chipGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  padding: 4px 8px;
+  color: #35443d;
+  background: #f2f1e8;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.chip input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: #1e6b58;
+}
+
+.toggleRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.pickerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+  gap: 8px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.pickerCard {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 8px;
+  border: 1px solid rgba(80, 92, 84, 0.36);
+  border-radius: var(--radius-sm);
+  padding: 6px;
+  color: var(--color-ink);
+  background: #fffdf4;
+  cursor: pointer;
+  text-align: left;
+}
+
+.pickerCard img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.pickerPortrait {
+  position: relative;
+  overflow: hidden;
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  background: #d6ddd5;
+}
+
+.operatorCardName {
+  overflow: hidden;
+  padding: 6px 0px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.operatorMeta {
+  display: block;
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.tag {
+  border-radius: 999px;
+  padding: 2px 5px;
+  color: #35443d;
+  background: #e7ebdf;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.eliteSelect {
+  width: 88px;
+}
+
+@media (max-width: 640px) {
+  .dialogControls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .eliteSelect {
+    width: 100%;
+  }
+}

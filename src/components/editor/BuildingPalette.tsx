@@ -7,7 +7,8 @@ import {
 } from "../../domain/bentoDefinitions";
 import type { PosterComponentAddKind } from "../../domain/scheduleDocument";
 import type { BentoRoomTypeId, ScheduleDocument } from "../../domain/types";
-import styles from "../../styles/editor.module.css";
+import shared from "../../styles/shared.module.css";
+import styles from "../../styles/BuildingPalette.module.css";
 import { ContourButton } from "../ui/ContourButton";
 
 interface BuildingPaletteProps {
@@ -140,10 +141,10 @@ export function BuildingPalette({
       </div>
       <div className={styles.paletteBody}>
         <label className={styles.paletteField}>
-          <span className={styles.fieldLabel}>布局</span>
+          <span className={shared.fieldLabel}>布局</span>
           <select
             aria-label="布局"
-            className={styles.textInput}
+            className={shared.textInput}
             onChange={(event) => onLayoutChange(event.target.value)}
             value={document.layoutId}
           >

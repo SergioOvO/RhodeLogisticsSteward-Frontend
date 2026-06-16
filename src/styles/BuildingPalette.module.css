@@ -1,0 +1,154 @@
+.panel {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid rgba(80, 92, 84, 0.32);
+  border-radius: var(--radius-md);
+  background: rgba(248, 247, 240, 0.88);
+  box-shadow: var(--shadow-tight);
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-height: 42px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(80, 92, 84, 0.22);
+}
+
+.panelHeaderActions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 6px;
+  align-items: center;
+}
+
+.paletteBody {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 16px;
+  overflow: hidden;
+  padding: 12px 14px 14px;
+}
+
+.paletteField {
+  display: grid;
+  gap: 6px;
+}
+
+.paletteSectionTitle {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.facilityTemplateList {
+  display: grid;
+  min-height: 0;
+  align-content: start;
+  gap: 16px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.facilityTemplate,
+.posterComponentTemplate {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 46px;
+  border: 1px solid rgba(80, 92, 84, 0.34);
+  border-radius: 0;
+  padding: 7px 8px;
+  color: #111814;
+  background: #fffef8;
+  cursor: grab;
+  text-align: left;
+}
+
+.facilityTemplate:active,
+.posterComponentTemplate:active {
+  cursor: grabbing;
+}
+
+.facilityTemplate[data-color-role="trade"] {
+  background: #dbe9ff;
+}
+
+.facilityTemplate[data-color-role="manufacture"] {
+  background: #ffe5b0;
+}
+
+.facilityTemplate[data-color-role="power"] {
+  background: #e2f2cc;
+}
+
+.facilityTemplate[data-disabled="true"] {
+  box-shadow: inset 0 0 0 1px rgba(80, 92, 84, 0.18);
+  cursor: grab;
+}
+
+.facilityTemplateIcon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid rgba(80, 92, 84, 0.24);
+  border-radius: 6px;
+  color: #111814;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.facilityTemplateText {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.facilityTemplateTitle {
+  overflow: hidden;
+  color: #111814;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.facilityTemplateMeta {
+  color: rgba(17, 24, 20, 0.62);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.posterComponentPalette {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.posterComponentTemplateList {
+  display: grid;
+  gap: 10px;
+}
+
+@media (max-width: 1180px) {
+  .panel {
+    overflow: visible;
+  }
+
+  .paletteBody {
+    overflow: visible;
+  }
+}

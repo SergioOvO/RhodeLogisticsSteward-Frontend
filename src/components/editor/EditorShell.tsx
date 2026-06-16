@@ -15,7 +15,8 @@ import type {
   SlotAddress,
 } from "../../domain/types";
 import { useScheduleStore } from "../../state/useScheduleStore";
-import styles from "../../styles/editor.module.css";
+import styles from "../../styles/EditorShell.module.css";
+import shared from "../../styles/shared.module.css";
 import { ScheduleCanvas } from "../canvas/ScheduleCanvas";
 import { DragDropProvider } from "../dnd/DragDropProvider";
 import { OperatorPickerDialog } from "../picker/OperatorPickerDialog";
@@ -299,11 +300,11 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
   function renderCompactSelects() {
     return (
       <>
-        <label className={styles.field}>
-          <span className={styles.fieldLabel}>布局</span>
+        <label className={shared.field}>
+          <span className={shared.fieldLabel}>布局</span>
           <select
             aria-label="布局"
-            className={styles.textInput}
+            className={shared.textInput}
             onChange={(event) => store.setLayout(event.target.value)}
             value={store.document.layoutId}
           >
@@ -314,11 +315,11 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
             ))}
           </select>
         </label>
-        <label className={styles.field}>
-          <span className={styles.fieldLabel}>队列</span>
+        <label className={shared.field}>
+          <span className={shared.fieldLabel}>队列</span>
           <select
             aria-label="队列"
-            className={styles.textInput}
+            className={shared.textInput}
             onChange={(event) => store.setQueueCount(Number(event.target.value))}
             value={store.document.queueCount}
           >

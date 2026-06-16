@@ -14,7 +14,8 @@ import type {
   SlotAddress,
   SlotAssignment,
 } from "../../domain/types";
-import styles from "../../styles/editor.module.css";
+import shared from "../../styles/shared.module.css";
+import styles from "../../styles/OperatorPickerDialog.module.css";
 import { ContourButton } from "../ui/ContourButton";
 
 const ROOM_TYPE_LABEL: Record<string, string> = {
@@ -131,20 +132,20 @@ export function OperatorPickerDialog({
             {selectedSlot ? `选择干员 · 槽位 ${selectedSlot.slotIndex + 1}` : "选择干员"}
           </Dialog.Title>
           <div className={styles.dialogControls}>
-            <label className={styles.field}>
-              <span className={styles.fieldLabel}>搜索</span>
+            <label className={shared.field}>
+              <span className={shared.fieldLabel}>搜索</span>
               <input
                 autoFocus
-                className={styles.textInput}
+                className={shared.textInput}
                 onChange={(event) => setFilters((current) => ({ ...current, text: event.target.value }))}
                 placeholder="名称 / alias"
                 value={filters.text}
               />
             </label>
-            <label className={styles.field}>
-              <span className={styles.fieldLabel}>精英状态</span>
+            <label className={shared.field}>
+              <span className={shared.fieldLabel}>精英状态</span>
               <select
-                className={[styles.selectTrigger, styles.eliteSelect].join(" ")}
+                className={[shared.selectTrigger, styles.eliteSelect].join(" ")}
                 onChange={(event) => onElitePhaseChange(parseElitePhase(event.target.value))}
                 value={selectedSlotAssignment?.elitePhase ? String(selectedSlotAssignment.elitePhase) : "auto"}
               >
@@ -157,7 +158,7 @@ export function OperatorPickerDialog({
           </div>
           <div className={styles.dialogFilterBar}>
             <div className={styles.filterGroup}>
-              <span className={styles.fieldLabel}>房间技能</span>
+              <span className={shared.fieldLabel}>房间技能</span>
               <div className={styles.chipGrid}>
                 {(reference?.roomTypes ?? []).map((roomType) => (
                   <label className={styles.chip} key={roomType.id}>
@@ -177,7 +178,7 @@ export function OperatorPickerDialog({
               </div>
             </div>
             <div className={styles.filterGroup}>
-              <span className={styles.fieldLabel}>产物公式</span>
+              <span className={shared.fieldLabel}>产物公式</span>
               <div className={styles.chipGrid}>
                 {(reference?.productionFormulaTypes ?? []).map((formulaType) => (
                   <label className={styles.chip} key={formulaType.id}>
