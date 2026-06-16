@@ -1,0 +1,32 @@
+.bentoGrid {
+  position: relative;
+  grid-row: 2;
+  isolation: isolate;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgba(40, 50, 44, 0.48);
+  background: #eef1e8;
+}
+
+.bentoGrid[data-guides-visible="true"] {
+  background:
+    linear-gradient(90deg, rgba(35, 49, 42, 0.08) 1px, transparent 1px) 0 0 / calc(100% / 24) calc(100% / 12),
+    linear-gradient(180deg, rgba(35, 49, 42, 0.07) 1px, transparent 1px) 0 0 / calc(100% / 24) calc(100% / 12),
+    linear-gradient(90deg, rgba(35, 49, 42, 0.15) 1px, transparent 1px) 0 0 / calc(100% / 6) calc(100% / 4),
+    linear-gradient(180deg, rgba(35, 49, 42, 0.12) 1px, transparent 1px) 0 0 / calc(100% / 6) calc(100% / 4),
+    #eef1e8;
+}
+
+.bentoGrid[data-grid-over="true"] {
+  box-shadow: inset 0 0 0 2px #1e6b58;
+}
+
+.gridDropHint {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  color: rgba(40, 50, 44, 0.5);
+  font-size: 10px;
+  font-weight: 900;
+  pointer-events: none;
+}

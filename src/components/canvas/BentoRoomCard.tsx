@@ -14,7 +14,7 @@ import type {
   ProductKind,
   SlotAddress,
 } from "../../domain/types";
-import styles from "../../styles/canvas.module.css";
+import styles from "../../styles/BentoRoomCard.module.css";
 import type { QueueRoomAssignment } from "./BentoCanvas";
 import { BentoRoomSlot } from "./BentoRoomSlot";
 

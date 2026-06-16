@@ -16,7 +16,7 @@ import {
   productLabel,
   tradingProductOptions,
 } from "../../domain/bentoDefinitions";
-import styles from "../../styles/canvas.module.css";
+import styles from "../../styles/PosterCanvas.module.css";
 import { EditableText } from "./EditableText";
 import { PosterOperatorSlot } from "./PosterOperatorSlot";
 

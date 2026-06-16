@@ -12,16 +12,12 @@ import {
   columnThemeMap,
   getPosterColumns,
   normalizePosterCanvas,
-  type PosterColumnDef,
 } from "../../domain/posterCanvas";
 import {
   eventPosterCanvas,
   nextDragRect,
   nextResizeRect,
   snapPosterRect,
-  POSTER_GUIDE_COLUMNS,
-  POSTER_GUIDE_ROWS,
-  POSTER_SNAP_THRESHOLD_PX,
   type InteractionKind,
   type PointerLike,
   type ResizeEdge,
@@ -44,11 +40,7 @@ import {
   productLabel,
   tradingProductOptions,
 } from "../../domain/bentoDefinitions";
-import {
-  calculateRoomEffectiveEfficiency,
-  calculateRoomPaperEfficiency,
-} from "../../domain/mockCalculator";
-import styles from "../../styles/canvas.module.css";
+import styles from "../../styles/PosterCanvas.module.css";
 import { BentoCanvas } from "./BentoCanvas";
 import { EditableText } from "./EditableText";
 import { PosterOperatorSlot } from "./PosterOperatorSlot";

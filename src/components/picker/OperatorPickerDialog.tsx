@@ -149,6 +149,7 @@ export function OperatorPickerDialog({
                 value={selectedSlotAssignment?.elitePhase ? String(selectedSlotAssignment.elitePhase) : "auto"}
               >
                 <option value="auto">自动</option>
+                <option value="0">精0</option>
                 <option value="1">精一</option>
                 <option value="2">精二</option>
               </select>

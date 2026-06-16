@@ -1,0 +1,240 @@
+.bentoRoomCard {
+  --bento-operator-size: 22px;
+  --bento-name-height: 8px;
+  --bento-slot-size: var(--bento-operator-size);
+
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(31, 38, 35, 0.38);
+  border-radius: 0;
+  padding: 5px;
+  color: #1f2623;
+  background: #fff;
+  box-shadow: 0 6px 15px rgba(31, 38, 35, 0.14);
+  touch-action: none;
+}
+
+.bentoRoomCard[data-color-role="trade"] {
+  background: #d8e8ff;
+  border-color: #6c9ad4;
+}
+
+.bentoRoomCard[data-color-role="manufacture"] {
+  background: #ffe2a8;
+  border-color: #d89b34;
+}
+
+.bentoRoomCard[data-color-role="power"] {
+  background: #dff0c8;
+  border-color: #89b861;
+}
+
+.bentoRoomCard[data-color-role="other"] {
+  background: #fffdf7;
+  border-color: rgba(31, 38, 35, 0.34);
+}
+
+.bentoRoomCard[data-dragging="true"] {
+  z-index: 30;
+  opacity: 0.92;
+}
+
+.bentoRoomHeader {
+  display: flex;
+  position: relative;
+  z-index: 4;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 5px;
+  cursor: grab;
+}
+
+.bentoRoomHeader:active {
+  cursor: grabbing;
+}
+
+.bentoRoomTitleGroup {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.bentoRoomTitle {
+  overflow: hidden;
+  color: #17201b;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bentoRoomMeta {
+  color: rgba(31, 38, 35, 0.68);
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.bentoRoomMeta [data-product-label] {
+  color: #7a4f00;
+}
+
+.iconButton {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(31, 38, 35, 0.22);
+  border-radius: 5px;
+  padding: 0;
+  color: #33423b;
+  background: rgba(255, 255, 255, 0.62);
+  cursor: pointer;
+}
+
+.productSelectLabel {
+  display: flex;
+  position: relative;
+  z-index: 3;
+  min-width: 0;
+  align-items: center;
+  gap: 5px;
+  color: rgba(31, 38, 35, 0.7);
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.productSelect {
+  width: 100%;
+  min-width: 0;
+  height: 22px;
+  border: 1px solid rgba(31, 38, 35, 0.26);
+  border-radius: 5px;
+  padding: 2px 5px;
+  color: #17201b;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.bentoQueueList {
+  display: grid;
+  min-height: 0;
+  gap: 2px;
+  align-content: space-evenly;
+  overflow: hidden;
+}
+
+.bentoQueueRow {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 3px;
+  align-items: center;
+  padding: 1px 0;
+}
+
+.bentoQueueLabel,
+.bentoQueuePaper {
+  display: grid;
+  min-width: 0;
+  color: rgba(31, 38, 35, 0.72);
+  font-size: 6px;
+  font-weight: 900;
+  line-height: 1.05;
+}
+
+.bentoQueueLabel span,
+.bentoQueuePaper {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bentoQueueSlots {
+  display: flex;
+  min-width: 0;
+  gap: 3px;
+  align-items: center;
+}
+
+.facilitySettings {
+  position: absolute;
+  z-index: 20;
+  top: 26px;
+  right: 6px;
+  display: grid;
+  min-width: 156px;
+  gap: 7px;
+  border: 1px solid rgba(31, 38, 35, 0.34);
+  border-radius: 7px;
+  padding: 8px;
+  background: rgba(255, 253, 244, 0.98);
+  box-shadow: 0 10px 24px rgba(31, 38, 35, 0.22);
+}
+
+.facilitySettingsTitle {
+  color: #17201b;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.productOptionGroup {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.productOption {
+  min-width: 0;
+  min-height: 26px;
+  border: 1px solid rgba(31, 38, 35, 0.24);
+  border-radius: 5px;
+  padding: 3px 5px;
+  color: #2d332f;
+  background: #f4f1df;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1.05;
+}
+
+.productOption[data-active="true"] {
+  color: #151d18;
+  border-color: #b26c00;
+  background: #ffd783;
+}
+
+.resizeHandle {
+  position: absolute;
+  z-index: 5;
+  border: 0;
+  padding: 0;
+  background: rgba(31, 38, 35, 0.2);
+}
+
+.resizeHandleRight {
+  top: 24px;
+  right: 0;
+  bottom: 16px;
+  width: 6px;
+  cursor: ew-resize;
+}
+
+.resizeHandleBottom {
+  right: 18px;
+  bottom: 0;
+  left: 18px;
+  height: 6px;
+  cursor: ns-resize;
+}

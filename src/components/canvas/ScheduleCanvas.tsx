@@ -13,7 +13,7 @@ import type {
   ScheduleDocument,
   SlotAddress,
 } from "../../domain/types";
-import styles from "../../styles/canvas.module.css";
+import styles from "../../styles/ScheduleCanvas.module.css";
 import { PosterCanvas } from "./PosterCanvas";
 
 interface ScheduleCanvasProps {

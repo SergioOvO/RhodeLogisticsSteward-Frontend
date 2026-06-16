@@ -1,0 +1,19 @@
+.editableText {
+  min-width: 0;
+  cursor: text;
+  border-radius: 3px;
+  background-color: transparent
+}
+
+.editableText:hover {
+  box-shadow: inset 0 -1px 0 rgba(30, 107, 88, 0.48);
+}
+
+.editableText:focus {
+  outline-color: transparent;
+  outline-style: none;
+  outline-width: 0;
+  outline-offset: 0;
+  background: transparent;
+  box-shadow: none;
+}

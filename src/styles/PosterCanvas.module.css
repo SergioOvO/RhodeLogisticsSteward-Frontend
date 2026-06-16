@@ -1,0 +1,910 @@
+.posterCardShell {
+  display: grid;
+  grid-row: 1;
+  height: 100%;
+  min-height: 0;
+}
+
+.posterCardShell [data-bento-canvas] {
+  grid-row: auto;
+}
+
+.posterCanvas {
+  --poster-operator-size-lg: 30px;
+  --poster-operator-size: var(--poster-operator-size-lg);
+  --poster-name-height: 9px;
+
+  position: relative;
+  display: block;
+  grid-row: 1;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgba(40, 50, 44, 0.48);
+  background: #f4f1e7;
+  padding: 0;
+}
+
+.posterCanvas[data-poster-over="true"] {
+  outline: 2px solid rgba(38, 107, 88, 0.72);
+  outline-offset: -4px;
+}
+
+.posterCanvasTools {
+  position: absolute;
+  z-index: 300;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  border: 1px solid rgba(40, 50, 44, 0.24);
+  border-radius: 6px;
+  padding: 4px;
+  background: rgba(255, 253, 244, 0.92);
+  box-shadow: 0 6px 18px rgba(31, 38, 35, 0.16);
+}
+
+.posterCanvasTools button,
+.posterCanvasTools label,
+.posterCanvasTools select {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid rgba(40, 50, 44, 0.26);
+  border-radius: 5px;
+  padding: 3px 7px;
+  color: #26302b;
+  background: rgba(255, 255, 255, 0.76);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.posterCanvasTools select {
+  max-width: 92px;
+}
+
+.posterCanvasTools button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.posterCanvasTools input {
+  width: 12px;
+  height: 12px;
+  margin: 0;
+}
+
+.posterGuideLayer,
+.posterComponentLayer {
+  position: absolute;
+  inset: 0;
+}
+
+.posterGuideLayer {
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(30, 107, 88, 0.15) 1px, transparent 1px) 0 0 / calc(100% / 24) calc(100% / 12),
+    linear-gradient(180deg, rgba(30, 107, 88, 0.12) 1px, transparent 1px) 0 0 / calc(100% / 24) calc(100% / 12);
+}
+
+.posterComponentLayer {
+  z-index: 2;
+}
+
+.posterComponent {
+  position: absolute;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgba(40, 50, 44, 0.34);
+  border-radius: 0;
+  background: rgba(255, 253, 244, 0.84);
+  box-shadow: 0 6px 14px rgba(31, 38, 35, 0.12);
+  touch-action: none;
+}
+
+.posterComponent[data-poster-component-type="infrastructure"] {
+  box-shadow: none;
+}
+
+.posterComponent[data-poster-component-selected="true"] {
+  border-color: #111814;
+  overflow: visible;
+}
+
+.posterComponentHandle {
+  position: absolute;
+  z-index: 26;
+  top: 4px;
+  left: 4px;
+  overflow: hidden;
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0;
+  color: #17201b;
+  background:
+    radial-gradient(circle, rgba(31, 38, 35, 0.5) 1px, transparent 1.5px) 1px 1px / 5px 5px,
+    rgba(255, 253, 244, 0.56);
+  cursor: grab;
+  opacity: 0;
+}
+
+.posterComponentHandle:active {
+  cursor: grabbing;
+}
+
+.posterComponent:hover .posterComponentHandle,
+.posterComponent[data-poster-component-selected="true"] .posterComponentHandle {
+  opacity: 1;
+}
+
+.posterComponent[data-poster-infrastructure-source="section"] .posterComponentHandle {
+  right: 4px;
+  left: auto;
+}
+
+.contextMenuPositioner {
+  z-index: 1000;
+  outline: none;
+}
+
+.contextMenuPopup {
+  min-width: 112px;
+  overflow: hidden;
+  border: 1px solid rgba(31, 38, 35, 0.28);
+  border-radius: 0;
+  padding: 4px;
+  color: #1f2623;
+  background: rgba(255, 253, 244, 0.98);
+  box-shadow: 0 12px 28px rgba(31, 38, 35, 0.2);
+}
+
+.contextMenuItem {
+  display: flex;
+  min-height: 26px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-radius: 0;
+  padding: 5px 9px;
+  cursor: default;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  outline: none;
+  user-select: none;
+}
+
+.contextMenuChevron {
+  color: rgba(31, 38, 35, 0.56);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.contextMenuItem[data-highlighted] {
+  color: #f8f7f0;
+  background: #1e6b58;
+}
+
+.contextMenuItem[data-highlighted] .contextMenuChevron {
+  color: #f8f7f0;
+}
+
+.contextMenuItem[data-selected="true"] {
+  color: #17201b;
+  background: rgba(30, 107, 88, 0.12);
+}
+
+.contextMenuItem[data-danger="true"][data-highlighted] {
+  background: #a9362a;
+}
+
+.contextMenuSeparator {
+  height: 1px;
+  margin: 4px;
+  background: rgba(31, 38, 35, 0.18);
+}
+
+.posterComponentActions {
+  position: absolute;
+  z-index: 28;
+  top: -31px;
+  right: 0;
+  display: flex;
+  max-width: max(180px, 100%);
+  gap: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(31, 38, 35, 0.18);
+  border-radius: 6px;
+  padding: 3px;
+  background: rgba(255, 253, 244, 0.96);
+  box-shadow: 0 8px 20px rgba(31, 38, 35, 0.16);
+}
+
+.posterComponentActions button {
+  min-width: 0;
+  height: 22px;
+  border: 1px solid rgba(31, 38, 35, 0.18);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: rgba(31, 38, 35, 0.78);
+  background: rgba(255, 253, 244, 0.72);
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.posterComponentBody {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.posterFacilityGroupBody {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.posterSingleRoom {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  padding: 4px 6px;
+}
+
+.posterSingleRoom[data-product="PureGold"] {
+  background: rgba(255, 240, 189, 0.45);
+}
+
+.posterSingleRoom[data-product="CombatRecord"] {
+  background: #ffede0;
+}
+
+.posterSingleRoom .posterRoomHeader {
+  display: flex;
+  min-width: 0;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(40, 50, 44, 0.22);
+}
+
+.posterRoomName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.posterRoomQueueList {
+  display: grid;
+  min-height: 0;
+  gap: 2px;
+  align-content: start;
+}
+
+.posterRoomQueueRow {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 2px;
+  padding: 3px 0;
+}
+
+.posterRoomQueueLabel {
+  display: flex;
+  min-width: 0;
+  justify-content: space-between;
+  gap: 4px;
+  color: rgba(31, 38, 35, 0.72);
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.posterRoomQueueLabel span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.posterSingleFacility {
+  display: grid;
+  min-height: 0;
+  gap: 2px;
+  align-content: start;
+  overflow: hidden;
+  padding: 2px;
+}
+
+.posterCompactInfrastructure {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+  align-content: center;
+  overflow: hidden;
+  padding: 7px 9px;
+  color: #17201b;
+}
+
+.posterCompactInfrastructureMark {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(31, 38, 35, 0.34);
+  background:
+    linear-gradient(90deg, transparent 44%, rgba(31, 38, 35, 0.72) 44% 56%, transparent 56%),
+    linear-gradient(0deg, transparent 44%, rgba(31, 38, 35, 0.72) 44% 56%, transparent 56%),
+    rgba(255, 253, 244, 0.62);
+}
+
+.posterCompactInfrastructureText {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.posterCompactInfrastructureText strong,
+.posterCompactInfrastructureText span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.posterCompactInfrastructureText strong {
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.posterCompactInfrastructureText span {
+  color: rgba(31, 38, 35, 0.64);
+  font-size: 8px;
+  font-weight: 650;
+  line-height: 1.1;
+}
+
+.posterTextComponent,
+.posterLaneComponent {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  align-content: start;
+  gap: 4px;
+  padding: 2px 4px;
+  color: #17201b;
+}
+
+.posterTextComponent strong,
+.posterLaneComponent strong {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+}
+
+.posterTextComponent span,
+.posterLaneComponent small {
+  overflow: hidden;
+  color: rgba(31, 38, 35, 0.76);
+  font-size: 10px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+}
+
+.posterLaneComponent {
+  justify-items: center;
+  padding-inline: 22px;
+  text-align: center;
+}
+
+.posterComponentMetric {
+  background: #eef4e6;
+}
+
+.posterComponentNote {
+  background: #fff8df;
+}
+
+.posterComponentLane {
+  background: rgba(255, 253, 244, 0.9);
+}
+
+.posterComponentDivider {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.posterDividerLine {
+  align-self: center;
+  height: 1px;
+  min-height: 1px;
+  background: rgba(40, 50, 44, 0.58);
+}
+
+.posterResizeHandle {
+  position: absolute;
+  z-index: 25;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  opacity: 0;
+}
+
+.posterResizeHandleTop {
+  top: -7px;
+  right: -7px;
+  left: -7px;
+  height: 14px;
+  cursor: ns-resize;
+}
+
+.posterResizeHandleRight {
+  top: -7px;
+  right: -7px;
+  bottom: -7px;
+  width: 14px;
+  cursor: ew-resize;
+}
+
+.posterResizeHandleBottom {
+  right: -7px;
+  bottom: -7px;
+  left: -7px;
+  height: 14px;
+  cursor: ns-resize;
+}
+
+.posterResizeHandleLeft {
+  top: -7px;
+  bottom: -7px;
+  left: -7px;
+  width: 14px;
+  cursor: ew-resize;
+}
+
+.posterMetaRail {
+  display: flex;
+  min-width: 0;
+  gap: 6px;
+  align-items: center;
+  overflow: hidden;
+  color: #26302b;
+  font-size: 8px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.posterMetaRail span {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.posterMetaRail strong {
+  margin-right: 4px;
+  color: #17201b;
+  font-weight: 900;
+}
+
+.posterLaneRail,
+.posterComboStrip {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.posterLaneRail {
+  grid-template-columns: repeat(var(--poster-lane-count), minmax(0, 1fr));
+}
+
+.posterComboStrip {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.posterLaneRail span,
+.posterComboStrip span {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid rgba(40, 50, 44, 0.34);
+  border-radius: 3px;
+  padding: 2px 5px;
+  color: #17201b;
+  background: rgba(255, 253, 244, 0.86);
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.posterLaneRail small {
+  overflow: hidden;
+  color: rgba(31, 38, 35, 0.66);
+  font-size: 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.posterSectionGrid {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: repeat(var(--poster-section-count), minmax(0, 1fr));
+  gap: 4px;
+  overflow: hidden;
+}
+
+.posterSplitGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: auto hidden;
+}
+
+.posterComboGrid {
+  grid-template-columns: 1.1fr 1.5fr 1.2fr 1.6fr 0.9fr;
+}
+
+.posterSection {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid rgba(40, 50, 44, 0.34);
+  border-radius: 0;
+}
+
+.posterSectionHeader {
+  display: flex;
+  min-width: 0;
+  min-height: 18px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 2px 5px;
+  color: #17201b;
+  border-bottom: 1px solid rgba(40, 50, 44, 0.28);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.posterSectionHeader span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.posterSectionHeader span:last-child {
+  color: rgba(31, 38, 35, 0.68);
+  font-size: 7px;
+}
+
+.posterSectionRows {
+  --poster-room-stack-size: 1;
+  --poster-operator-size: clamp(
+    16px,
+    calc((100cqh / var(--poster-lane-count) / var(--poster-room-stack-size)) - 14px),
+    var(--poster-operator-size-lg)
+  );
+  --poster-name-height: clamp(6px, calc(var(--poster-operator-size) * 0.3), 9px);
+
+  display: grid;
+  min-height: 0;
+  grid-template-rows: repeat(var(--poster-lane-count), minmax(0, 1fr));
+  container-type: size;
+}
+
+.posterSectionLane {
+  display: grid;
+  min-height: 0;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 2px;
+  align-content: stretch;
+  padding: 2px;
+  border-bottom: 1px solid rgba(40, 50, 44, 0.24);
+  overflow: hidden;
+}
+
+.posterSectionLane:last-child {
+  border-bottom: 0;
+}
+
+.posterRoomBlock {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 1px;
+  padding: 2px;
+  background: rgba(255, 253, 244, 0.38);
+  overflow: hidden;
+}
+
+.posterRoomBlock[data-product="PureGold"] {
+  background: #fff1c7;
+}
+
+.posterRoomBlock[data-product="CombatRecord"] {
+  background: #ffede0;
+}
+
+.posterRoomBlock[data-room-type="MANUFACTURE"][data-product="OriginStone"] {
+  background: #ffd6b2;
+}
+
+.posterRoomBlock[data-room-type="TRADING"][data-product="OriginStone"] {
+  background: #bde0f8
+}
+
+.posterRoomBlock[data-room-type="TRADING"],
+.posterRoomBlock[data-room-type="MANUFACTURE"] {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 35%);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.posterRoomBlock[data-room-type="POWER"] {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 50%);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.posterRoomBlock[data-room-type="TRADING"] .posterRoomHeader,
+.posterRoomBlock[data-room-type="MANUFACTURE"] .posterRoomHeader,
+.posterRoomBlock[data-room-type="POWER"] .posterRoomHeader {
+  grid-column: 1 / -1;
+}
+
+.posterRoomBlock[data-room-type="TRADING"] .posterEfficiency,
+.posterRoomBlock[data-room-type="MANUFACTURE"] .posterEfficiency,
+.posterRoomBlock[data-room-type="POWER"] .posterEfficiency {
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 4px;
+  min-width: 0;
+}
+
+.posterProductSelect {
+  width: 50px;
+  height: 15px;
+  border: 1px solid rgba(40, 50, 44, 0.18);
+  border-radius: 3px;
+  padding: 1px 2px;
+  color: rgba(31, 38, 35, 0.72);
+  background: rgba(255, 253, 244, 0.64);
+  cursor: pointer;
+  font-size: 8px;
+  font-weight: 600;
+  outline: none;
+  appearance: none;
+  text-align: center;
+}
+
+.posterRoomHeader {
+  display: flex;
+  min-width: 0;
+  justify-content: space-between;
+  align-items: center;
+  gap: 3px;
+  color: #26302b;
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.posterRoomHeader span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.posterRoomHeader span:last-child {
+  color: rgba(31, 38, 35, 0.62);
+  font-size: 8px;
+}
+
+.posterSlotRows {
+  display: grid;
+  grid-auto-rows: 1fr;
+  min-height: 0;
+}
+
+.posterSlots {
+  display: flex;
+  min-width: 0;
+  flex-wrap: nowrap;
+  gap: 3px;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.posterSlot {
+  display: grid;
+  width: var(--poster-operator-size);
+  min-width: var(--poster-operator-size);
+  height: calc(var(--poster-operator-size) + var(--poster-name-height));
+  grid-template-rows: var(--poster-operator-size) var(--poster-name-height);
+  border: 1px solid transparent;
+  padding: 0;
+  color: #17201b;
+  background: transparent;
+  cursor: pointer;
+}
+
+.posterSlot:hover,
+.posterSlot[data-over="true"],
+.posterSlot[data-selected="true"] {
+  border-color: rgba(30, 107, 88, 0.62);
+  outline: 1px solid rgba(30, 107, 88, 0.5);
+  outline-offset: 1px;
+}
+
+.posterSlot[data-filled="false"] {
+  height: var(--poster-operator-size);
+  grid-template-rows: 1fr;
+  place-items: center;
+}
+
+.posterPortrait {
+  position: relative;
+  display: grid;
+  width: var(--poster-operator-size);
+  height: var(--poster-operator-size);
+  aspect-ratio: 1 / 1;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 3px;
+  background: transparent;
+}
+
+.posterEmptySlotAdd {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: rgba(31, 38, 35, 0.62);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.posterSlotName {
+  display: grid;
+  min-width: 0;
+  align-items: center;
+  justify-items: center;
+  color: #17201b;
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.posterSlotName span {
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.posterSlotName span:last-child {
+  display: none;
+}
+
+.posterEfficiency {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1px 5px;
+  color: rgba(31, 38, 35, 0.72);
+  font-size: 8px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.posterEfficiency .posterEfficiencyText {
+  max-width: 100%;
+  min-width: 24px;
+  min-height: 1em;
+  flex-shrink: 1;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  pointer-events: auto;
+  text-align: center;
+  border-radius: 2px;
+  padding: 1px 3px;
+  background: transparent;
+}
+
+.posterEfficiencyText:hover {
+  background: rgba(255, 253, 244, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(30, 107, 88, 0.18);
+}
+
+.posterEfficiencyText:focus {
+  background: rgba(255, 253, 244, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(30, 107, 88, 0.5);
+  outline: none;
+}
+
+.posterEfficiencyText:empty::before {
+  content: "点击编辑";
+  color: rgba(31, 38, 35, 0.22);
+  font-style: italic;
+  pointer-events: none;
+}
+
+.posterEfficiency span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.posterBlockNote,
+.posterNotes {
+  overflow: hidden;
+  color: #6d3e00;
+  font-size: 6px;
+  font-weight: 900;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.posterNotes {
+  min-width: 0;
+  color: rgba(31, 38, 35, 0.66);
+  font-size: 8px;
+}
+
+.posterThemeControl {
+  background: #eef0e5;
+}
+
+.posterThemeTrade {
+  background: #d9e3f3;
+}
+
+.posterThemeGold {
+  background: #fff0bd;
+}
+
+.posterThemeRecord {
+  background: #ffe4d3;
+}
+
+.posterThemeJade {
+  background: #f6c17d;
+}
+
+.posterThemeManufacture {
+  background: #eee5d4;
+}
+
+.posterThemePower {
+  background: #e1f1cf;
+}
+
+.posterThemeOther {
+  background: #fffdf7;
+}

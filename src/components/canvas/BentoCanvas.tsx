@@ -11,7 +11,7 @@ import type {
   ScheduleQueue,
   SlotAddress,
 } from "../../domain/types";
-import styles from "../../styles/canvas.module.css";
+import styles from "../../styles/BentoCanvas.module.css";
 import { BentoRoomCard } from "./BentoRoomCard";
 
 interface BentoCanvasProps {

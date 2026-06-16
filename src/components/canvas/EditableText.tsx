@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ElementType, type FocusEvent, type KeyboardEvent } from "react";
-import styles from "../../styles/canvas.module.css";
+import styles from "../../styles/EditableText.module.css";
 
 interface EditableTextProps {
   as?: ElementType;

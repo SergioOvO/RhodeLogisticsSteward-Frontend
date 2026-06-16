@@ -7,7 +7,7 @@ import type {
   SlotAddress,
   SlotAssignment,
 } from "../../domain/types";
-import styles from "../../styles/canvas.module.css";
+import styles from "../../styles/PosterCanvas.module.css";
 import { OperatorPortrait } from "../shared/OperatorPortrait";
 
 const eliteIconPaths: Record<ElitePhase, string> = {

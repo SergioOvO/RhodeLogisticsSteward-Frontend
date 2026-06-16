@@ -1,0 +1,93 @@
+.bentoSlotGrid {
+  display: grid;
+  min-height: 0;
+  gap: 4px;
+  align-content: center;
+}
+
+.bentoSlot {
+  display: grid;
+  position: relative;
+  z-index: 3;
+  width: var(--bento-slot-size);
+  height: calc(var(--bento-operator-size) + var(--bento-name-height));
+  flex: 0 0 var(--bento-slot-size);
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: var(--bento-operator-size) var(--bento-name-height);
+  overflow: hidden;
+  border: 1px solid rgba(31, 38, 35, 0.2);
+  border-radius: 6px;
+  padding: 1px;
+  color: #17201b;
+  background: rgba(255, 255, 255, 0.48);
+  cursor: pointer;
+}
+
+.bentoSlot[data-over="true"],
+.bentoSlot[data-selected="true"] {
+  outline: 2px solid #1e6b58;
+  outline-offset: -2px;
+}
+
+.bentoPortrait {
+  position: relative;
+  display: grid;
+  width: var(--bento-operator-size);
+  height: var(--bento-operator-size);
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgba(238, 241, 232, 0.84);
+}
+
+.bentoSlotText {
+  display: grid;
+  min-width: 0;
+  align-items: center;
+  text-align: center;
+}
+
+.bentoSlot .operatorName {
+  font-size: 6px;
+  line-height: 1;
+}
+
+.operatorName,
+.slotHint {
+  overflow: hidden;
+  font-size: 8px;
+  font-weight: 900;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slotHint {
+  display: none;
+  color: #727d75;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.bentoSlot .slotHint {
+  display: none;
+}
+
+.bentoEfficiency {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+  color: rgba(31, 38, 35, 0.74);
+  font-size: 8px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.bentoEfficiency span {
+  white-space: normal;
+}

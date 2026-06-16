@@ -8,7 +8,7 @@ import type {
   SlotAssignment,
 } from "../../domain/types";
 import { OperatorPortrait } from "../shared/OperatorPortrait";
-import styles from "../../styles/canvas.module.css";
+import styles from "../../styles/BentoRoomSlot.module.css";
 
 const eliteIconPaths: Record<ElitePhase, string> = {
   1: "/operators/elite/图标_升级_精英化1.webp",
