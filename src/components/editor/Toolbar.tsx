@@ -1,5 +1,4 @@
 import { Select } from "@base-ui/react/select";
-import type { ReactNode } from "react";
 import {
   ArrowCounterClockwiseIcon,
   CaretDownIcon,
@@ -34,18 +33,25 @@ interface ToolbarProps {
   onReset: () => void;
 }
 
-function LayoutSelect({
+interface SelectOption {
+  label: string;
+  value: string;
+}
+
+function BaseSelect({
+  label,
   value,
+  items,
   onChange,
 }: {
+  label: string;
   value: string;
+  items: readonly SelectOption[];
   onChange: (value: string) => void;
 }) {
-  const items = bentoLayoutIds.map((layoutId) => ({ label: layoutId, value: layoutId }));
-
   return (
     <label className={shared.field}>
-      <span className={shared.fieldLabel}>布局</span>
+      <span className={shared.fieldLabel}>{label}</span>
       <Select.Root items={items} onValueChange={(next) => onChange(String(next))} value={value}>
         <Select.Trigger className={shared.selectTrigger}>
           <Select.Value />
@@ -77,31 +83,20 @@ function LayoutSelect({
   );
 }
 
-function NativeSelect({
-  label,
-  value,
-  children,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  children: ReactNode;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <label className={shared.field}>
-      <span className={shared.fieldLabel}>{label}</span>
-      <select
-        aria-label={label}
-        className={shared.textInput}
-        onChange={(event) => onChange(event.target.value)}
-        value={value}
-      >
-        {children}
-      </select>
-    </label>
-  );
-}
+const queueItems = queueCountOptions.map((count) => ({
+  label: `${count} 队列`,
+  value: String(count),
+}));
+
+const templateItems = posterTemplateIds.map((id) => ({
+  label: posterTemplateLabels[id],
+  value: id,
+}));
+
+const modeItems = posterModeIds.map((id) => ({
+  label: posterModeLabels[id],
+  value: id,
+}));
 
 export function Toolbar({
   document,
@@ -114,43 +109,35 @@ export function Toolbar({
   onExportPng,
   onReset,
 }: ToolbarProps) {
+  const layoutItems = bentoLayoutIds.map((id) => ({ label: id, value: id }));
+
   return (
     <div className={styles.toolbar}>
       <div className={styles.toolbarLeading}>
-        <LayoutSelect onChange={onLayoutChange} value={document.layoutId} />
-        <NativeSelect
+        <BaseSelect
+          label="布局"
+          items={layoutItems}
+          onChange={onLayoutChange}
+          value={document.layoutId}
+        />
+        <BaseSelect
           label="队列"
+          items={queueItems}
           onChange={(value) => onQueueCountChange(Number(value))}
           value={String(document.queueCount)}
-        >
-          {queueCountOptions.map((count) => (
-            <option key={count} value={count}>
-              {count} 队列
-            </option>
-          ))}
-        </NativeSelect>
-        <NativeSelect
+        />
+        <BaseSelect
           label="导出模板"
+          items={templateItems}
           onChange={(value) => onPosterTemplateChange(value as PosterTemplateId)}
           value={normalizePosterTemplateId(document.posterTemplateId)}
-        >
-          {posterTemplateIds.map((templateId) => (
-            <option key={templateId} value={templateId}>
-              {posterTemplateLabels[templateId]}
-            </option>
-          ))}
-        </NativeSelect>
-        <NativeSelect
+        />
+        <BaseSelect
           label="排班模式"
+          items={modeItems}
           onChange={(value) => onPosterModeChange(value as PosterMode)}
           value={normalizePosterMode(document.posterMode)}
-        >
-          {posterModeIds.map((mode) => (
-            <option key={mode} value={mode}>
-              {posterModeLabels[mode]}
-            </option>
-          ))}
-        </NativeSelect>
+        />
       </div>
       <div className={styles.toolbarActions}>
         <ContourButton
