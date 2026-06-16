@@ -100,13 +100,10 @@ function slotPayload(slot: SlotAssignment): SlotPayload {
 }
 
 function applySlotPayload(slot: SlotAssignment, payload: SlotPayload): SlotAssignment {
-  const base: SlotAssignment = {
+  return {
     slotIndex: slot.slotIndex,
     ...(slot.isOptional !== undefined ? { isOptional: slot.isOptional } : {}),
-  };
-
-  return {
-    ...base,
+    ...(slot.elitePhase !== undefined ? { elitePhase: slot.elitePhase } : {}),
     ...(payload.operatorId !== undefined ? { operatorId: payload.operatorId } : {}),
     ...(payload.overrideName !== undefined ? { overrideName: payload.overrideName } : {}),
     ...(payload.elitePhase !== undefined ? { elitePhase: payload.elitePhase } : {}),

@@ -150,3 +150,22 @@ export function expandBentoLayout(layoutId: string): BentoRoomTypeId[] {
     "HIRE",
   ];
 }
+
+export function productLabel(product?: ProductKind): string {
+  if (product === "Money") return "龙门币";
+  if (product === "PureGold") return "赤金";
+  if (product === "CombatRecord") return "经验";
+  if (product === "OriginStone") return "源石碎片";
+  return "";
+}
+
+export const manufactureProductOptions = [
+  { value: "PureGold" as const, label: "赤金" },
+  { value: "CombatRecord" as const, label: "作战记录" },
+  { value: "OriginStone" as const, label: "源石碎片" },
+];
+
+export const tradingProductOptions = [
+  { value: "Money" as const, label: "龙门币" },
+  { value: "OriginStone" as const, label: "合成玉" },
+];

@@ -1,7 +1,7 @@
 import { useDraggable } from "@dnd-kit/core";
 import { XIcon } from "@phosphor-icons/react";
 import { useState, type CSSProperties, type MouseEvent, type PointerEvent } from "react";
-import { bentoRoomDefinitions, BENTO_GRID } from "../../domain/bentoDefinitions";
+import { bentoRoomDefinitions, BENTO_GRID, manufactureProductOptions, productLabel } from "../../domain/bentoDefinitions";
 import {
   calculateRoomEffectiveEfficiency,
   calculateRoomPaperEfficiency,
@@ -18,19 +18,6 @@ import styles from "../../styles/canvas.module.css";
 import type { QueueRoomAssignment } from "./BentoCanvas";
 import { BentoRoomSlot } from "./BentoRoomSlot";
 
-const manufactureProductOptions: Array<{ value: ProductKind; label: string }> = [
-  { value: "PureGold", label: "赤金" },
-  { value: "CombatRecord", label: "作战记录" },
-  { value: "OriginStone", label: "源石碎片" },
-];
-
-const productLabels: Partial<Record<ProductKind, string>> = {
-  Money: "龙门币",
-  PureGold: "赤金",
-  CombatRecord: "作战记录",
-  OriginStone: "源石碎片",
-};
-
 interface BentoRoomCardProps {
   room: BentoRoomNode;
   assignments: QueueRoomAssignment[];
@@ -43,10 +30,6 @@ interface BentoRoomCardProps {
   onProductChange: (roomNodeId: string, product?: ProductKind) => void;
   onResize: (roomNodeId: string, rect: GridRect) => void;
   onRemove: (roomNodeId: string) => void;
-}
-
-function productLabel(product?: ProductKind): string {
-  return product ? productLabels[product] ?? product : "";
 }
 
 function isInteractiveTarget(target: EventTarget): boolean {

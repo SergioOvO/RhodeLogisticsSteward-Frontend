@@ -9,14 +9,23 @@ import { ContextMenu } from "@base-ui/react/context-menu";
 import { useDroppable } from "@dnd-kit/core";
 import {
   buildDefaultPosterCanvas,
-  clampPosterRect,
   columnThemeMap,
   getPosterColumns,
-  MIN_POSTER_COMPONENT_SIZE,
   normalizePosterCanvas,
-  POSTER_COORD_MAX,
   type PosterColumnDef,
 } from "../../domain/posterCanvas";
+import {
+  eventPosterCanvas,
+  nextDragRect,
+  nextResizeRect,
+  snapPosterRect,
+  POSTER_GUIDE_COLUMNS,
+  POSTER_GUIDE_ROWS,
+  POSTER_SNAP_THRESHOLD_PX,
+  type InteractionKind,
+  type PointerLike,
+  type ResizeEdge,
+} from "../../domain/posterInteraction";
 import { buildPosterViewModel, type PosterBlock, type PosterSection } from "../../domain/posterViewModel";
 import type { PosterComponentContentPatch } from "../../domain/scheduleDocument";
 import type {
@@ -31,6 +40,11 @@ import type {
   SlotAddress,
 } from "../../domain/types";
 import {
+  manufactureProductOptions,
+  productLabel,
+  tradingProductOptions,
+} from "../../domain/bentoDefinitions";
+import {
   calculateRoomEffectiveEfficiency,
   calculateRoomPaperEfficiency,
 } from "../../domain/mockCalculator";
@@ -38,6 +52,7 @@ import styles from "../../styles/canvas.module.css";
 import { BentoCanvas } from "./BentoCanvas";
 import { EditableText } from "./EditableText";
 import { PosterOperatorSlot } from "./PosterOperatorSlot";
+import { PosterSectionColumn } from "./PosterSectionColumn";
 
 interface PosterCanvasProps {
   document: ScheduleDocument;
@@ -62,13 +77,6 @@ interface PosterCanvasProps {
 }
 
 type PosterStyle = CSSProperties & Record<`--${string}`, string | number>;
-type ResizeEdge = "top" | "right" | "bottom" | "left";
-type InteractionKind = "drag" | "resize";
-
-interface PointerLike {
-  clientX: number;
-  clientY: number;
-}
 
 interface PosterInteractionState {
   componentId: string;
@@ -106,19 +114,6 @@ const columnThemeStyles: Record<string, string> = {
 
 const primaryPointerButton = 0;
 const dragThresholdPx = 6;
-const POSTER_GUIDE_COLUMNS = 24;
-const POSTER_GUIDE_ROWS = 12;
-const POSTER_SNAP_THRESHOLD_PX = 8;
-const manufactureProductOptions = [
-  { value: "PureGold", label: "赤金" },
-  { value: "CombatRecord", label: "作战记录" },
-  { value: "OriginStone", label: "源石碎片" },
-] as const satisfies readonly { value: ProductKind; label: string }[];
-
-const tradingProductOptions = [
-  { value: "Money", label: "龙门币" },
-  { value: "OriginStone", label: "合成玉" },
-] as const satisfies readonly { value: ProductKind; label: string }[];
 const resizeEdges = ["top", "right", "bottom", "left"] as const satisfies readonly ResizeEdge[];
 const resizeEdgeClasses: Record<ResizeEdge, string> = {
   top: styles.posterResizeHandleTop,
@@ -126,22 +121,6 @@ const resizeEdgeClasses: Record<ResizeEdge, string> = {
   bottom: styles.posterResizeHandleBottom,
   left: styles.posterResizeHandleLeft,
 };
-
-function productLabel(product?: ProductKind): string {
-  if (product === "Money") {
-    return "龙门币";
-  }
-  if (product === "PureGold") {
-    return "赤金";
-  }
-  if (product === "CombatRecord") {
-    return "经验";
-  }
-  if (product === "OriginStone") {
-    return "源石碎片";
-  }
-  return "";
-}
 
 function groupedBlocks(section: PosterSection, laneId: string): PosterBlock[] {
   return section.blocks.filter((block) => block.laneId === laneId);
@@ -168,124 +147,6 @@ function componentClasses(component: PosterComponent, themeClass?: string) {
   ]
     .filter(Boolean)
     .join(" ");
-}
-
-function nextDragRect(
-  canvas: HTMLElement,
-  startRect: PosterRect,
-  startX: number,
-  startY: number,
-  event: PointerLike,
-): PosterRect {
-  const bounds = canvas.getBoundingClientRect();
-  const dx = ((event.clientX - startX) / bounds.width) * 10000;
-  const dy = ((event.clientY - startY) / bounds.height) * 10000;
-
-  return clampPosterRect({
-    ...startRect,
-    x: startRect.x + dx,
-    y: startRect.y + dy,
-  });
-}
-
-function nextResizeRect(
-  canvas: HTMLElement,
-  startRect: PosterRect,
-  startX: number,
-  startY: number,
-  event: PointerLike,
-  edge: ResizeEdge,
-): PosterRect {
-  const bounds = canvas.getBoundingClientRect();
-  const dx = ((event.clientX - startX) / bounds.width) * 10000;
-  const dy = ((event.clientY - startY) / bounds.height) * 10000;
-
-  if (edge === "right") {
-    return resizeRectFromEdge(startRect, edge, startRect.x + startRect.w + dx);
-  }
-  if (edge === "bottom") {
-    return resizeRectFromEdge(startRect, edge, startRect.y + startRect.h + dy);
-  }
-  if (edge === "left") {
-    return resizeRectFromEdge(startRect, edge, startRect.x + dx);
-  }
-  return resizeRectFromEdge(startRect, edge, startRect.y + dy);
-}
-
-function snapCoordinate(value: number, step: number, threshold: number): number {
-  const guide = Math.round(value / step) * step;
-  return Math.abs(guide - value) <= threshold ? Math.round(guide) : Math.round(value);
-}
-
-function clampValue(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
-
-function resizeRectFromEdge(rect: PosterRect, edge: ResizeEdge, edgePosition: number): PosterRect {
-  const right = rect.x + rect.w;
-  const bottom = rect.y + rect.h;
-
-  if (edge === "right") {
-    const nextRight = clampValue(edgePosition, rect.x + MIN_POSTER_COMPONENT_SIZE, POSTER_COORD_MAX);
-    return { ...rect, w: Math.round(nextRight - rect.x) };
-  }
-  if (edge === "bottom") {
-    const nextBottom = clampValue(edgePosition, rect.y + MIN_POSTER_COMPONENT_SIZE, POSTER_COORD_MAX);
-    return { ...rect, h: Math.round(nextBottom - rect.y) };
-  }
-  if (edge === "left") {
-    const nextLeft = clampValue(edgePosition, 0, right - MIN_POSTER_COMPONENT_SIZE);
-    const x = Math.round(nextLeft);
-    return { ...rect, x, w: Math.round(right - x) };
-  }
-
-  const nextTop = clampValue(edgePosition, 0, bottom - MIN_POSTER_COMPONENT_SIZE);
-  const y = Math.round(nextTop);
-  return { ...rect, y, h: Math.round(bottom - y) };
-}
-
-function snapPosterRect(
-  canvas: HTMLElement,
-  rect: PosterRect,
-  kind: InteractionKind,
-  edge?: ResizeEdge,
-): PosterRect {
-  const bounds = canvas.getBoundingClientRect();
-  const thresholdX = (POSTER_SNAP_THRESHOLD_PX / Math.max(1, bounds.width)) * 10000;
-  const thresholdY = (POSTER_SNAP_THRESHOLD_PX / Math.max(1, bounds.height)) * 10000;
-  const stepX = 10000 / POSTER_GUIDE_COLUMNS;
-  const stepY = 10000 / POSTER_GUIDE_ROWS;
-
-  if (kind === "drag") {
-    return clampPosterRect({
-      ...rect,
-      x: snapCoordinate(rect.x, stepX, thresholdX),
-      y: snapCoordinate(rect.y, stepY, thresholdY),
-    });
-  }
-
-  const next = { ...rect };
-  const right = rect.x + rect.w;
-  const bottom = rect.y + rect.h;
-
-  if (edge === "left") {
-    return resizeRectFromEdge(rect, edge, snapCoordinate(rect.x, stepX, thresholdX));
-  }
-  if (edge === "right") {
-    return resizeRectFromEdge(rect, edge, snapCoordinate(right, stepX, thresholdX));
-  }
-  if (edge === "top") {
-    return resizeRectFromEdge(rect, edge, snapCoordinate(rect.y, stepY, thresholdY));
-  }
-  if (edge === "bottom") {
-    return resizeRectFromEdge(rect, edge, snapCoordinate(bottom, stepY, thresholdY));
-  }
-
-  return clampPosterRect(next);
-}
-
-function eventPosterCanvas(target: Element): HTMLElement | null {
-  return target.closest("[data-poster-canvas]") as HTMLElement | null;
 }
 
 export function PosterCanvas({
@@ -698,137 +559,22 @@ export function PosterCanvas({
     );
   }
 
-  function renderSectionColumn(_component: PosterComponent, column: PosterColumnDef) {
-    return (
-      <div className={styles.posterFacilityGroupBody} style={{ gridTemplateRows: "minmax(0, 1fr)" }}>
-        <div
-          className={styles.posterSectionRows}
-          style={{ "--poster-lane-count": document.queues.length, "--poster-room-stack-size": column.roomNodeIds.length } as PosterStyle}
-        >
-          {document.queues.map((queue) => (
-            <div className={styles.posterSectionLane} key={queue.id}>
-              {column.roomNodeIds.map((roomNodeId) => {
-                const room = document.canvas.rooms.find((candidate) => candidate.roomNodeId === roomNodeId);
-                const assignment = queue.roomAssignments.find((item) => item.roomNodeId === roomNodeId);
-                if (!room || !assignment) {
-                  return null;
-                }
-
-                const slotRows =
-                  room.roomType === "CONTROL"
-                    ? [assignment.operators.slice(0, 3), assignment.operators.slice(3)]
-                    : [assignment.operators];
-
-                return (
-                  <article className={styles.posterRoomBlock} data-product={room.product} data-room-type={room.roomType} key={roomNodeId}>
-                    <div className={styles.posterRoomHeader}>
-                      <span>{room.label}</span>
-                      {room.roomType === "MANUFACTURE" ? (
-                        <select
-                          className={styles.posterProductSelect}
-                          onChange={(e) => onRoomProductChange(room.roomNodeId, e.target.value as ProductKind)}
-                          onPointerDown={(e) => e.stopPropagation()}
-                          value={room.product ?? ""}
-                        >
-                          {manufactureProductOptions.map((opt) => (
-                            <option key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </option>
-                          ))}
-                        </select>
-                      ) : room.roomType === "TRADING" ? (
-                        <select
-                          className={styles.posterProductSelect}
-                          onChange={(e) => onRoomProductChange(room.roomNodeId, e.target.value as ProductKind)}
-                          onPointerDown={(e) => e.stopPropagation()}
-                          value={room.product ?? ""}
-                        >
-                          {tradingProductOptions.map((opt) => (
-                            <option key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <span>{productLabel(room.product)}</span>
-                      )}
-                    </div>
-                    <div className={styles.posterSlotRows}>
-                      {slotRows.map((rowSlots, rowIndex) => (
-                        <div className={styles.posterSlots} key={rowIndex}>
-                          {rowSlots.map((slot) => {
-                            const address = {
-                              queueId: queue.id,
-                              assignmentId: assignment.assignmentId,
-                              slotIndex: slot.slotIndex,
-                            };
-                            const operator = slot.operatorId ? operatorMap.get(slot.operatorId) : undefined;
-
-                            return (
-                              <PosterOperatorSlot
-                                address={address}
-                                key={slot.slotIndex}
-                                onSelect={onSlotSelect}
-                                operator={operator}
-                                product={assignment.product}
-                                reference={reference}
-                                roomType={room.roomType}
-                                selected={
-                                  selectedSlot?.queueId === address.queueId &&
-                                  selectedSlot.assignmentId === address.assignmentId &&
-                                  selectedSlot.slotIndex === address.slotIndex
-                                }
-                                slot={slot}
-                              />
-                            );
-                          })}
-                        </div>
-                      ))}
-                    </div>
-                    {(() => {
-                      const vert = room.roomType === "TRADING" || room.roomType === "MANUFACTURE" || room.roomType === "POWER";
-                      const sep = vert ? "\n" : "  ";
-                      const stored = assignment.paperEfficiencyLabel.trim();
-                      const display = stored || `${calculateRoomPaperEfficiency(assignment)}${sep}${calculateRoomEffectiveEfficiency(assignment)}`;
-
-                      return (
-                        <div className={styles.posterEfficiency}>
-                          <EditableText
-                            ariaLabel={`编辑 ${room.label} 效率`}
-                            className={styles.posterEfficiencyText}
-                            multiline
-                            onCommit={(text) => {
-                              if (!text.trim()) {
-                                onRoomEfficiencyLabelsChange?.(queue.id, assignment.assignmentId, {
-                                  paperEfficiencyLabel: "",
-                                  effectiveEfficiencyLabel: "",
-                                });
-                              } else {
-                                onRoomEfficiencyLabelsChange?.(queue.id, assignment.assignmentId, {
-                                  paperEfficiencyLabel: text,
-                                });
-                              }
-                            }}
-                            value={display}
-                          />
-                        </div>
-                      );
-                    })()}
-                  </article>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   function renderComponentBody(component: PosterComponent) {
     if (component.type === "infrastructure" && component.sectionId) {
       const column = columnMap.get(component.sectionId);
       if (column) {
-        return renderSectionColumn(component, column);
+        return (
+          <PosterSectionColumn
+            column={column}
+            document={document}
+            onRoomEfficiencyLabelsChange={onRoomEfficiencyLabelsChange}
+            onRoomProductChange={onRoomProductChange}
+            onSlotSelect={onSlotSelect}
+            operators={operators}
+            reference={reference}
+            selectedSlot={selectedSlot}
+          />
+        );
       }
       const section = sectionMap.get(component.sectionId);
       return section ? renderInfrastructureSection(component, section) : null;
