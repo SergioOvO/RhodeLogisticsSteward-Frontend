@@ -1,13 +1,3 @@
-export type FacilityKind =
-  | "Control"
-  | "Trade"
-  | "Mfg"
-  | "Power"
-  | "Reception"
-  | "Office"
-  | "Dormitory"
-  | "Other";
-
 export type ProductKind =
   | "Money"
   | "PureGold"
@@ -16,8 +6,6 @@ export type ProductKind =
   | "General"
   | "HR"
   | "Rest";
-
-export type FacilityTheme = "control" | "trade" | "gold" | "record" | "other";
 
 export type BuildingRoomTypeId =
   | "CONTROL"
@@ -80,49 +68,6 @@ export interface OperatorManifest {
     warnings: string[];
   };
   operators: Operator[];
-}
-
-export interface RoomTemplate {
-  roomId: string;
-  roomType: string;
-  roomIndex: number;
-  slotCount: number;
-  product?: string;
-  label?: string;
-}
-
-export interface FacilityColumn {
-  id: string;
-  label: string;
-  facility: FacilityKind;
-  product?: ProductKind;
-  theme: FacilityTheme;
-  roomsPerQueue: RoomTemplate[];
-  widthWeight: number;
-}
-
-export interface CanvasQueueProfile {
-  columnWeights: Record<string, number>;
-  slotColumns: Record<number, number>;
-  efficiencyWidth: number;
-  maxSlotSize: number;
-  slotGap: number;
-  compact: boolean;
-}
-
-export interface CanvasProfile {
-  queueProfiles: Record<number, CanvasQueueProfile>;
-  slotColumns: Record<number, number>;
-}
-
-export interface LayoutPreset {
-  id: string;
-  label: string;
-  buildingType: number;
-  defaultQueueCount: number;
-  columns: FacilityColumn[];
-  canvasProfile: CanvasProfile;
-  otherRooms: RoomTemplate[];
 }
 
 export interface SlotAssignment {
