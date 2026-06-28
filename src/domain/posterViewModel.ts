@@ -1,3 +1,5 @@
+/** @fileoverview ScheduleDocument → 海报视图模型（sections/lanes/blocks），供默认布局和旧 section 渲染使用。 */
+
 import { calculateRoomEffectiveEfficiency, calculateRoomPaperEfficiency } from "./mockCalculator";
 import {
   normalizePosterMode,

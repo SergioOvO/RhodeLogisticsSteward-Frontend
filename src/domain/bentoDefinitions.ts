@@ -1,3 +1,5 @@
+/** @fileoverview 便当画布房间定义（类型/尺寸/颜色/槽位数）、布局扩展、产品标签。 */
+
 import type {
   BentoRoomColorRole,
   BentoRoomTypeId,

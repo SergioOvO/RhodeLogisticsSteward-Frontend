@@ -1,3 +1,5 @@
+/** @fileoverview 海报画布——PosterComponent 层叠渲染、拖拽/缩放交互、吸附网格、右键菜单。 */
+
 import {
   useMemo,
   useState,

@@ -1,3 +1,5 @@
+/** @fileoverview 全局状态管理——封装 scheduleDocument 变更、localStorage 持久化、海报画布撤销/重做。 */
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createDefaultSchedule } from "../domain/createDefaultSchedule";
 import { buildDefaultPosterCanvas, normalizePosterCanvas } from "../domain/posterCanvas";

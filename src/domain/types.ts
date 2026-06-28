@@ -1,3 +1,5 @@
+/** @fileoverview 核心数据模型：ScheduleDocument、BentoRoomNode、PosterComponent 等类型定义。 */
+
 export type ProductKind =
   | "Money"
   | "PureGold"

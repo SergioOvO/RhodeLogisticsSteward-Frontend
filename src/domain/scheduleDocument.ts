@@ -1,3 +1,5 @@
+/** @fileoverview 所有排班数据变更操作——assign/clear/swap、房间增删移、海报组件 CRUD、布局切换。纯函数，不可变更新。 */
+
 import {
   bentoRoomDefinitions,
   BENTO_GRID,

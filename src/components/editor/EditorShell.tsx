@@ -1,3 +1,5 @@
+/** @fileoverview 全局编排器——数据加载、zoom/侧栏/focus 状态管理、store 连线、工具栏/侧栏/画布布局。 */
+
 import { useDroppable } from "@dnd-kit/core";
 import { Switch } from "@base-ui/react/switch";
 import { MinusIcon, PlusIcon, SidebarSimpleIcon } from "@phosphor-icons/react";

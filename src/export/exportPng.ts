@@ -1,3 +1,5 @@
+/** @fileoverview PNG 导出——html-to-image 2x 像素比，过滤拖拽手柄和导出隐藏元素。 */
+
 import { toPng } from "html-to-image";
 import type { ScheduleDocument } from "../domain/types";
 

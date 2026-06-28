@@ -1,3 +1,5 @@
+/** @fileoverview JSON 导入——支持原生 .json 和 MAA custom_infrast 格式，自动迁移 V1→V2。 */
+
 import { migrateScheduleDocument } from "../domain/migrateScheduleDocument";
 import type { Operator, ScheduleDocument } from "../domain/types";
 import { maaCustomInfrastToScheduleImport, type MaaImportReport } from "./maaCustomInfrast";

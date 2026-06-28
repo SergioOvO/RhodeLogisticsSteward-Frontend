@@ -1,3 +1,5 @@
+/** @fileoverview 海报拖拽/缩放数学计算——delta 转换、吸附网格、rect 裁剪。纯函数。 */
+
 import { clampPosterRect, MIN_POSTER_COMPONENT_SIZE, POSTER_COORD_MAX } from "./posterCanvas";
 import type { PosterRect } from "./types";
 

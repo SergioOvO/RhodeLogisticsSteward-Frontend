@@ -1,3 +1,5 @@
+/** @fileoverview 根据 layoutId + queueCount 创建新 ScheduleDocument，含默认房间和队列。 */
+
 import { bentoRoomDefinitions, BENTO_GRID, expandBentoLayout, isBentoLayoutId } from "./bentoDefinitions";
 import { packRooms } from "./bentoGrid";
 import { clampQueueCount } from "./queueLimits";

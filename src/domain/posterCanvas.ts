@@ -1,3 +1,5 @@
+/** @fileoverview 海报生成——默认布局、列定义（getPosterColumns）、列宽计算（columnRects）、组件规范化。 */
+
 import {
   buildPosterViewModel,
   type ConcretePosterTemplateId,
